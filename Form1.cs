@@ -16,6 +16,85 @@ namespace VCRobot
         protected IvcSelection m_component_selection;
         protected IvcComponent m_component;
 
+        public class VCRobot
+        {
+            private Form1 fm;
+            private ListBox lb;
+            private IvcComponent rb;
+            private int bc;
+            private string robname;
+            private IvcServo jointController;
+            private List<IvcEventProperty> joints;
+
+            public VCRobot(Form1 form, ListBox listBox, IvcComponent robot)
+            {
+                fm = form;
+                lb = listBox;
+                rb = (IvcComponent)robot;
+                robname = (string)rb.getProperty("Name");
+                bc = robot.RootNode.BehaviourCount;
+                //lb.Items.Add(string.Format("Component name: {0}. {1} behaviour(s) found in component", robname, bc));
+                jointController = null;
+
+                try
+                {
+                    for (int i = 0; i < bc; ++i)
+                    {
+                        IvcBehaviour beh = rb.RootNode.getBehaviour(i);
+                        string btype = (string)beh.getProperty("Type");
+                        if (btype == "ServoController" || btype == "RobotController")
+                        {
+                            jointController = (IvcServo)beh;
+                            break;
+                        }
+                    }
+                    if (jointController != null)
+                    {
+                        IvcPropertyList2 compprops = (IvcPropertyList2)rb;
+                        joints = new List<IvcEventProperty>();
+                        for (int i = 0; i < jointController.JointCount; i++)
+                        {
+                            string jointname = (string)jointController.getJoint(i).getProperty("Name");
+                            IvcEventProperty joint = (IvcEventProperty)compprops.getPropertyObject(jointname);
+                            joints.Add(joint);
+                        }
+                    }
+                }
+                catch
+                { 
+                }
+            }
+
+            public string getName()
+            {
+                return robname;
+            }
+
+            public void getJoints()
+            {
+                for (int i = 0; i < joints.Count; i++)
+                {
+                    lb.Items.Add(joints[i].getProperty("Name"));
+                                    
+                }
+            }
+
+
+            public void move()
+            {
+                double i = 0.0;
+                while (true)
+                {
+                    
+                    joints[0].Value = Math.Sin(i) * 90;
+                    i += 0.1;
+                    fm.m_application.render();
+   
+                }            
+            }
+        }
+
+        private List<VCRobot> m_robots = new List<VCRobot>();
 
         public Form1()
         {
@@ -30,17 +109,10 @@ namespace VCRobot
             {
                 int cc = m_application.ComponentCount;
                 initConnection();
-
             }
             catch
             {
             }
-
-
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
 
         }
 
@@ -48,7 +120,6 @@ namespace VCRobot
         {
             m_component_selection = m_application.findSelection("Component");
             updateComponentList();
- 
         }
 
         private void updateComponentList()
@@ -57,168 +128,12 @@ namespace VCRobot
             for (int i = 0; i < m_application.ComponentCount; i++)
             {
                 IvcComponent comp = m_application.getComponent(i);
-                string cname = (string)comp.getProperty("Name");
-                listBox1.Items.Add(cname);
+                VCRobot rob = new VCRobot(this, listBox1, comp);
+                m_robots.Add(rob);
             }
         }
-
-        private void driveRobot()
-        {
-            int itemCount = m_component_selection.ItemCount;
-            if (itemCount == 0)
-            {
-                listBox2.Items.Clear();
-                listBox2.Items.Add("No component selected");
-            }
-            else
-            {
-                listBox2.Items.Clear();
-                m_component = (IvcComponent)m_component_selection.getItem(0);
-                string robName = (string)m_component.getProperty("Name");
-                listBox2.Items.Add(robName);
-                try
-                {
-                    int bc = m_component.RootNode.BehaviourCount;
-                    IvcRobot robot = null;
-                    for (int i = 0; i < bc; ++i)
-                    {
-                        IvcBehaviour beh = m_component.RootNode.getBehaviour(i);
-                        string btype = (string)beh.getProperty("Type");
-                        listBox2.Items.Add(btype);
-                        if (btype == "RobotController")
-                        {
-                            robot = (IvcRobot)beh;
-                            listBox2.Items.Add(beh.ToString());
-                            int jc = (int)robot.JointCount;
-                            listBox2.Items.Add(jc);
-                            break;
-                        }
-
-                    }
-                    if (robot != null)
-                    {
-                        IvcMotionTester tester = (IvcMotionTester)robot.getMotionTester();
-                        //listBox2.Items.Add(robot.ToString());
-                        IvcMotionInterpolator motionPath = (IvcMotionInterpolator)robot.createMotionInterpolator();
-                        IvcMotionTarget target = (IvcMotionTarget)robot.createTarget();
-
-                        double[] position = new double[5];
-                        position[0] = 1250;
-                        position[1] = 0;
-                        position[2] = -25;
-                        position[3] = 0;
-                        position[4] = 0;
-                        position[5] = 0;
-
-                        for (int i = 0; i < 5; i++)
-                        {
-                            listBox2.Items.Add(position[i]);
-                        
-                        }
-
-                            //target.TargetMatrix;
-
-                            //target.TargetMode = 4;
-                            //target.TargetMatrix = position;
-
-                            //tester.set_CurrentTarget(ref target);
-                            //m_application.render();
-
-
-
-                            target.BaseMatrix = position;
-                        listBox2.Items.Add(position);
-
-                        position[0] = 39;
-                        position[1] = 198;
-                        position[2] = 180;
-                        position[3] = 0;
-                        position[4] = 0;
-                        position[5] = -90;
-
-                        target.ToolMatrix = position;
-
-
-                        double[] positionA = new double[5];
-                        positionA[0] = 1000;
-                        positionA[1] = 0;
-                        positionA[2] = 1000;
-                        positionA[3] = 0;
-                        positionA[4] = 90;
-                        positionA[5] = 0;
-
-                        listBox2.Items.Add("Entered");
-
-                        double[] positionB = new double[5];
-                        positionA[0] = 1250;
-                        positionA[1] = 0;
-                        positionA[2] = 1500;
-                        positionA[3] = 0;
-                        positionA[4] = -90;
-                        positionA[5] = 0;
-
-
-
-
-                        target.MotionType = 1;
-                        target.TargetMatrix = positionA;
-                        target.CurrentConfig = target.NearestConfig;
-                        motionPath.addTarget(ref target);
-                        target.TargetMatrix = positionB;
-                        motionPath.addTarget(ref target);
-
-                        double endtime = (double)motionPath.getCycleTimeAtTarget(1);
-                        listBox2.Items.Add(endtime);
-
-
-
-                        for (double time = 0.0; time < endtime; time += 0.1)
-                        {
-                            motionPath.interpolate(time, ref target);
-                            if (target.getConfigWarning(target.CurrentConfig) > 0)
-                            {
-                                listBox2.Items.Clear();
-                                listBox2.Items.Add("point unreachable");
-                            }
-
-
-
-                        }
-
-
-
-
-                    
-                    
-                    }
-
-                }
-                catch
-                { 
-                }
-
-
-
-
-
-                //IvcBehaviour beh = m_component.RootNode.getBehaviour(0)
-                ////IvcRobot robot = m_component.findBehaviour("RobotController");
-                //string robControllerName = (string)robot.getProperty("Name");
-                //listBox2.Items.Add(robControllerName);
-
-                
-            }
-
-
-        
-        }
-
-
-
-
 
         private delegate void UIUpdate();
-
 
         #region IvcClient Members
 
@@ -229,7 +144,7 @@ namespace VCRobot
 
         public void notifyApplication(bool AppReady)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         public void notifyCommand(ref IvcCommand command, int State)
@@ -254,10 +169,7 @@ namespace VCRobot
             //   type, but if the selection was changed programmatically, it can be
             //   another selection type.
 
-            Invoke(new UIUpdate(driveRobot));
-
-
-            
+            //Invoke(new UIUpdate(driveRobot));
 
         }
 
@@ -283,10 +195,30 @@ namespace VCRobot
 
         public bool queryContextMenu()
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         #endregion
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            VCRobot rob = m_robots[Convert.ToInt32(textBox1.Text)];
+            listBox1.Items.Add(rob.getName());
+            rob.getJoints();
+            rob.move();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+
 
     }
 
