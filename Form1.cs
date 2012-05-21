@@ -53,19 +53,13 @@ namespace VCRobot
                 string cname = (string)comp.getProperty("Name");
                 Console.WriteLine("Studying:    " + cname);
                 // for some strange reasons this doe snot work
-                //object[] result = comp.findBehavioursOfType("RobotController");
-                //Console.WriteLine(result);
-                for (int j = 0; j < comp.RootNode.BehaviourCount; j++)
+                object[] result = comp.findBehavioursOfType("RobotController");
+                for (int j = 0; j < result.Length; j++)
                 {
-                    IvcBehaviour behav = comp.RootNode.getBehaviour(j);
-                    if ((string)behav.getProperty("Type") == "RobotController")
-                    {
-                        Console.WriteLine(cname + " is a robot!");
-                        VCRobot rob = new VCRobot(comp);
-                        m_robots.Add(rob);
-                        RobotListBox.Items.Add(rob.getName());
-                        break;
-                    }
+                    Console.WriteLine(cname + " is a robot!");
+                    VCRobot rob = new VCRobot(comp);
+                    m_robots.Add(rob);
+                    RobotListBox.Items.Add(rob.getName());
                 }
 
             }
@@ -179,9 +173,16 @@ namespace VCRobot
         private void TestButton_Click(object sender, EventArgs e)
         {
             if (m_rob == null) { return; }
-            Console.WriteLine(m_rob.getj().ToString());
-            m_rob.movej(new double[6] {0, 0, 0, 0, 0, 0});
-            Console.WriteLine(m_rob.getj().ToString());
+            //Console.WriteLine(m_rob.getj().ToString());
+            try
+            {
+                m_rob.movej(new double[6] { 1100, 1100, 1100, 0, 0, 0 });
+                //m_rob.movej(new double[6] { 0, 0, 0, 0, 0, 0 });
+            }
+            catch
+            {
+            }
+            //Console.WriteLine(m_rob.getj().ToString());
         }
 
         private void trackBar1_Scroll(object sender, EventArgs e)
