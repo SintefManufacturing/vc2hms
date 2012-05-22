@@ -15,13 +15,9 @@ namespace VCRobot
     public partial class Form1 : Form, IvcClient
     {
         protected IvcApplication m_application;
-        protected IvcSelection m_component_selection;
-        protected IvcComponent m_component;
-
-        
-
         private List<VCRobot> m_robots = new List<VCRobot>();
         private VCRobot m_rob;
+
         public Form1()
         {
             InitializeComponent();
@@ -31,17 +27,11 @@ namespace VCRobot
             IvcClient client = (IvcClient)this;
             m_application.addClient(ref client);
             
-            int cc = m_application.ComponentCount;
-            Debug.WriteLine("Nb components: " + m_application.ComponentCount );
-            initConnection();           
 
+            updateComponentList();                   
         }
 
-        private void initConnection()
-        {
-            m_component_selection = m_application.findSelection("Component");
-            updateComponentList();
-        }
+
 
         private void updateComponentList()
         {
@@ -49,6 +39,8 @@ namespace VCRobot
             JointListBox.Items.Clear();
             RobotListBox.Items.Clear();
             m_robots.Clear();
+            trackBar1.Enabled = false;
+
             for (int i = 0; i < m_application.ComponentCount; i++)
             {              
                 IvcComponent comp = m_application.getComponent(i);
@@ -79,13 +71,13 @@ namespace VCRobot
         public void notifyApplication(bool AppReady)
         {
             //throw new NotImplementedException();
-            Console.WriteLine("NotifyApplication: ", Convert.ToString(AppReady));
+            //Console.WriteLine("NotifyApplication: ", Convert.ToString(AppReady));
         }
 
         public void notifyCommand(ref IvcCommand command, int State)
         {
             // This method is called when a command is started or stopped.
-            Console.WriteLine("NotifyCommand: ", Convert.ToString(command));
+            //Console.WriteLine("NotifyCommand: ", Convert.ToString(command));
         }
 
         public void notifyProgress(double Progress)
@@ -106,7 +98,7 @@ namespace VCRobot
             //   another selection type.
 
             //Invoke(new UIUpdate(driveRobot));
-            Console.WriteLine("NotifySelction: ", Convert.ToString(Selection));
+            //Console.WriteLine("NotifySelction: ", Convert.ToString(Selection));
 
         }
 
@@ -150,6 +142,7 @@ namespace VCRobot
 
         private void JointListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            trackBar1.Enabled = true;
             if (m_rob != null){
                 trackBar1.Value = Convert.ToInt16(m_rob.getJointVal(JointListBox.SelectedIndex));
             }
@@ -165,6 +158,7 @@ namespace VCRobot
 
         private void updateJoints(VCRobot rob)
         {
+            trackBar1.Enabled = false;
             JointListBox.Items.Clear();
             foreach ( string j in rob.getJoints())
             {
