@@ -47,6 +47,8 @@ namespace VCRobot
         {
             Debug.WriteLine("Updating component list");
             JointListBox.Items.Clear();
+            RobotListBox.Items.Clear();
+            m_robots.Clear();
             for (int i = 0; i < m_application.ComponentCount; i++)
             {              
                 IvcComponent comp = m_application.getComponent(i);
@@ -176,7 +178,7 @@ namespace VCRobot
             //Console.WriteLine(m_rob.getj().ToString());
             try
             {
-                m_rob.movej(new double[6] { 1100, 1100, 1100, 0, 0, 0 });
+                m_rob.movej(new double[6] { 914,  8,  1119,  0 , 90,  0});
                 //m_rob.movej(new double[6] { 0, 0, 0, 0, 0, 0 });
             }
             catch
