@@ -36,6 +36,8 @@
             this.label2 = new System.Windows.Forms.Label();
             this.trackBar1 = new System.Windows.Forms.TrackBar();
             this.TestButton = new System.Windows.Forms.Button();
+            this.MachineListBox = new System.Windows.Forms.ListBox();
+            this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -116,11 +118,32 @@
             this.TestButton.UseVisualStyleBackColor = true;
             this.TestButton.Click += new System.EventHandler(this.TestButton_Click);
             // 
+            // MachineListBox
+            // 
+            this.MachineListBox.FormattingEnabled = true;
+            this.MachineListBox.ItemHeight = 16;
+            this.MachineListBox.Location = new System.Drawing.Point(524, 32);
+            this.MachineListBox.Name = "MachineListBox";
+            this.MachineListBox.Size = new System.Drawing.Size(243, 308);
+            this.MachineListBox.TabIndex = 19;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(524, 8);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(54, 17);
+            this.label3.TabIndex = 20;
+            this.label3.Text = "Signals";
+            this.label3.Click += new System.EventHandler(this.label3_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(529, 403);
+            this.ClientSize = new System.Drawing.Size(1021, 403);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.MachineListBox);
             this.Controls.Add(this.TestButton);
             this.Controls.Add(this.trackBar1);
             this.Controls.Add(this.label2);
@@ -149,6 +172,8 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TrackBar trackBar1;
         private System.Windows.Forms.Button TestButton;
+        private System.Windows.Forms.ListBox MachineListBox;
+        private System.Windows.Forms.Label label3;
 
     }
 }

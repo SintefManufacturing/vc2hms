@@ -15,12 +15,15 @@ namespace VCRobot
     public partial class Form1 : Form, IvcClient
     {
         protected IvcApplication m_application;
-        private List<VCRobot> m_robots = new List<VCRobot>();
+        private List<VCRobot> m_robots; 
+        private List<Listener> m_listeners ;
         private VCRobot m_rob;
 
         public Form1()
         {
             InitializeComponent();
+            m_robots = new List<VCRobot>();
+            m_listeners = new List<Listener>();
             Debug.WriteLine(this.Name + "; starting");
             m_application = (IvcApplication)new vc3DCreate.vcc3DCreate();
 
@@ -46,7 +49,7 @@ namespace VCRobot
                 IvcComponent comp = m_application.getComponent(i);
                 string cname = (string)comp.getProperty("Name");
                 Console.WriteLine("Studying:    " + cname);
-                // for some strange reasons this doe snot work
+                // find robots
                 object[] result = comp.findBehavioursOfType("RobotController");
                 for (int j = 0; j < result.Length; j++)
                 {
@@ -55,6 +58,21 @@ namespace VCRobot
                     m_robots.Add(rob);
                     RobotListBox.Items.Add(rob.getName());
                 }
+                // Find machines
+                m_listeners.Clear();
+                result = comp.findBehavioursOfType("ComponentSignal");
+                for (int j = 0; j < result.Length; j++)
+                {
+                    Console.WriteLine(cname + " has component signal!");
+                    Listener listen = new Listener(cname, (IvcPropertyList2) result[j]);
+                    m_listeners.Add(listen);
+                    MachineListBox.Items.Add(listen.getID());
+                    //VCRobot rob = new VCRobot(comp);
+                    //m_robots.Add(rob);
+                    //RobotListBox.Items.Add(rob.getName());
+                }
+
+
 
             }
         }
@@ -189,6 +207,11 @@ namespace VCRobot
                 Console.WriteLine("Value: " + JointListBox.SelectedIndex);
                 m_rob.setJointVal(JointListBox.SelectedIndex, Convert.ToDouble(trackBar1.Value)); 
             }
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
         }
 
     }
