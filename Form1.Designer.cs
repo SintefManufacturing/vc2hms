@@ -1,4 +1,4 @@
-﻿namespace VCRobot
+﻿namespace vc2ice
 {
     partial class Form1
     {
@@ -124,7 +124,7 @@
             this.MachineListBox.ItemHeight = 16;
             this.MachineListBox.Location = new System.Drawing.Point(524, 32);
             this.MachineListBox.Name = "MachineListBox";
-            this.MachineListBox.Size = new System.Drawing.Size(243, 308);
+            this.MachineListBox.Size = new System.Drawing.Size(407, 308);
             this.MachineListBox.TabIndex = 19;
             // 
             // label3
@@ -154,7 +154,7 @@
             this.Controls.Add(this.JointListBox);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "VC2IceHMS";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
             this.ResumeLayout(false);

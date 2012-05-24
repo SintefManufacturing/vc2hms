@@ -10,7 +10,7 @@ using System.Threading;
 using vcCOM;
 using System.Diagnostics;
 
-namespace VCRobot
+namespace vc2ice
 {
     public partial class Form1 : Form, IvcClient
     {
@@ -67,9 +67,14 @@ namespace VCRobot
                     Listener listen = new Listener(cname, (IvcPropertyList2) result[j]);
                     m_listeners.Add(listen);
                     MachineListBox.Items.Add(listen.getID());
-                    //VCRobot rob = new VCRobot(comp);
-                    //m_robots.Add(rob);
-                    //RobotListBox.Items.Add(rob.getName());
+                }
+                result = comp.findBehavioursOfType("BooleanSignal");
+                for (int j = 0; j < result.Length; j++)
+                {
+                    Console.WriteLine(cname + " has boolean signal!");
+                    Listener listen = new Listener(cname, (IvcPropertyList2)result[j]);
+                    m_listeners.Add(listen);
+                    MachineListBox.Items.Add(listen.getID());
                 }
 
 
