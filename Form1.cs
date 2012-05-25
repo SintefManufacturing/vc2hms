@@ -45,10 +45,9 @@ namespace vc2ice
                 RobotListBox.Items.Add(rob.getName());
 
             }
-            Console.WriteLine("filling signal in listbox");
             foreach (Listener sig in m_vcapp.Signals)
             {
-                Console.WriteLine(sig);
+
                 MachineListBox.Items.Add(sig.getID());
                 MachineListBox.Items.Add(sig.getID());
             }
