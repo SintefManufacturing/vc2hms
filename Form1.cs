@@ -7,154 +7,59 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Threading;
-using vcCOM;
+
 using System.Diagnostics;
 
 
 namespace vc2ice
 {
-    public partial class Form1 : Form, IvcClient
+    public partial class Form1 : Form, VCClient
     {
-        protected IvcApplication m_application;
-        private List<VCRobot> m_robots; 
-        private List<Listener> m_listeners ;
-        private VCRobot m_rob;
+
         private IceApp m_iceapp;
+        private VCApp m_vcapp;
+        private VCRobot m_rob;
 
-        public Form1()
+        public Form1(IceApp iceapp, VCApp vcapp)
         {
-            InitializeComponent();
-            m_robots = new List<VCRobot>();
-            m_listeners = new List<Listener>();
-            Debug.WriteLine(this.Name + "; starting");
-            m_application = (IvcApplication)new vc3DCreate.vcc3DCreate();
+            InitializeComponent(); // MFC component, Windows stuff
 
-            IvcClient client = (IvcClient)this;
-            m_application.addClient(ref client);
+            m_iceapp = iceapp;
+            m_vcapp = vcapp;
+            vcapp.register(this);
 
-            //Ice object
-            m_iceapp = new IceApp();
-
-            updateComponentList();                   
+            updateComponentList();     
         }
-
-
 
         private void updateComponentList()
         {
-            Debug.WriteLine("Updating component list");
+            Console.WriteLine("Updating component list");
             JointListBox.Items.Clear();
             RobotListBox.Items.Clear();
-            m_robots.Clear();
+
             trackBar1.Enabled = false;
+            m_vcapp.updateDevicesList();
 
-            for (int i = 0; i < m_application.ComponentCount; i++)
-            {              
-                IvcComponent comp = m_application.getComponent(i);
-                string cname = (string)comp.getProperty("Name");
-                Console.WriteLine("Studying:    " + cname);
-                // find robots
-                object[] result = comp.findBehavioursOfType("RobotController");
-                for (int j = 0; j < result.Length; j++)
-                {
-                    Console.WriteLine(cname + " is a robot!");
-                    VCRobot rob = new VCRobot(comp);
-                    m_robots.Add(rob);
-                    RobotListBox.Items.Add(rob.getName());
-                }
-                // Find machines
-                m_listeners.Clear();
-                result = comp.findBehavioursOfType("ComponentSignal");
-                for (int j = 0; j < result.Length; j++)
-                {
-                    Console.WriteLine(cname + " has component signal!");
-                    Listener listen = new Listener(cname, (IvcPropertyList2) result[j]);
-                    m_listeners.Add(listen);
-                    MachineListBox.Items.Add(listen.getID());
-                }
-                result = comp.findBehavioursOfType("BooleanSignal");
-                for (int j = 0; j < result.Length; j++)
-                {
-                    Console.WriteLine(cname + " has boolean signal!");
-                    Listener listen = new Listener(cname, (IvcPropertyList2)result[j]);
-                    m_listeners.Add(listen);
-                    MachineListBox.Items.Add(listen.getID());
-                }
+            foreach (VCRobot rob in m_vcapp.Robots)
+            {
+                RobotListBox.Items.Add(rob.getName());
 
-
-
+            }
+            Console.WriteLine("filling signal in listbox");
+            foreach (Listener sig in m_vcapp.Signals)
+            {
+                Console.WriteLine(sig);
+                MachineListBox.Items.Add(sig.getID());
+                MachineListBox.Items.Add(sig.getID());
             }
         }
 
-        private delegate void UIUpdate();
-
-        #region IvcClient Members
-
-        public string ApplicationName
+        public void VCUpdate()
         {
-            get { throw new NotImplementedException(); }
-        }
-
-        public void notifyApplication(bool AppReady)
-        {
-            //throw new NotImplementedException();
-            //Console.WriteLine("NotifyApplication: ", Convert.ToString(AppReady));
-        }
-
-        public void notifyCommand(ref IvcCommand command, int State)
-        {
-            // This method is called when a command is started or stopped.
-            //Console.WriteLine("NotifyCommand: ", Convert.ToString(command));
-        }
-
-        public void notifyProgress(double Progress)
-        {
-            //throw new NotImplementedException();
-        }
-
-        public void notifySelection(ref IvcSelection Selection, int SelectionTypeChange)
-        {
-            // This method is when one of the following happens:
-            // - The currently active selection type changes. In this case 
-            //   SelectionTypeChange == 1, and Selection is the new currently active 
-            //   selection type.
-            // - Objects are selected or unselected. In this case 
-            //   SelectionTypeChange == 0, and Selection is the selection type where
-            //   the contents changed. Usually, this is the currently active selection
-            //   type, but if the selection was changed programmatically, it can be
-            //   another selection type.
-
-            //Invoke(new UIUpdate(driveRobot));
-            //Console.WriteLine("NotifySelction: ", Convert.ToString(Selection));
-
-        }
-
-        public void notifySimHeartbeat(double SimTime)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void notifySimulation(int State)
-        {
-            // when simulation state changes
-        }
-
-        public void notifyWorld(ref IvcComponent Component, bool Added)
-        {
-
-
             Invoke(new UIUpdate(updateComponentList));
-
-
-
         }
 
-        public bool queryContextMenu()
-        {
-            return true;
-        }
-
-        #endregion
+        private delegate void UIUpdate();
 
 
 
@@ -179,7 +84,7 @@ namespace vc2ice
         {
             Console.WriteLine("Selected: " + RobotListBox.SelectedItem.ToString());
            
-            m_rob = m_robots[RobotListBox.SelectedIndex];
+            m_rob = m_vcapp.Robots[RobotListBox.SelectedIndex];
             updateJoints(m_rob);       
         }
 

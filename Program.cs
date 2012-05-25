@@ -16,8 +16,21 @@ namespace vc2ice
             
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
-
+            IceApp iceapp = null;
+            VCApp vcapp = null;
+            try
+            {
+                iceapp = new IceApp();
+                vcapp = new VCApp();
+                Application.Run(new Form1(iceapp, vcapp));
+            }
+            finally
+            {
+                if (iceapp != null)
+                {
+                    iceapp.cleanup();
+                }
+            }
 
         }
     }

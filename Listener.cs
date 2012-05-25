@@ -3,7 +3,7 @@ using vcCOM;
 
 namespace vc2ice
 {
-    class Listener : IvcEventPropertyListener
+    public class Listener : IvcEventPropertyListener
     {
         IvcPropertyList2 m_Signal;
         String m_ComponentName;

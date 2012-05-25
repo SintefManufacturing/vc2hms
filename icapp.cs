@@ -10,7 +10,7 @@ namespace vc2ice
         Ice.Communicator m_communicator;
 
 
-        public void IceApp()
+        public IceApp()
         {
 
             //initialize Ice
@@ -38,6 +38,17 @@ namespace vc2ice
             catch (Ice.NotRegisteredException)
             {
                 Console.WriteLine("If we fail here it is probably because the Icebox objects are not registered");
+            }
+            catch (Ice.NoEndpointException)
+            {
+                Console.WriteLine("IceGrid Server not found!!!!!");
+            }
+        }
+        public void cleanup()
+        {
+            if (m_communicator != null)
+            {
+                m_communicator.destroy();
             }
         }
 

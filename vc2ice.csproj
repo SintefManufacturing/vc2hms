@@ -58,8 +58,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
-    <Compile Include="iceif.cs" />
+    <Compile Include="vcapp.cs" />
+    <Compile Include="icapp.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="hms.cs" />
     <Compile Include="Listener.cs" />
@@ -126,7 +126,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties ZerocIce_Enabled="False" ZerocIce_OutputDir="." ZerocIce_Prefix="True" />
+      <UserProperties ZerocIce_Prefix="True" ZerocIce_OutputDir="." ZerocIce_Enabled="False" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
