@@ -38,6 +38,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\ZeroC\Ice-3.4.2\bin\Ice.dll</HintPath>
     </Reference>
+    <Reference Include="IceGrid, Version=3.4.2.0, Culture=neutral, PublicKeyToken=cdd571ade22f2f16, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\ZeroC\Ice-3.4.2\bin\IceGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="IceStorm, Version=3.4.2.0, Culture=neutral, PublicKeyToken=cdd571ade22f2f16, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\ZeroC\Ice-3.4.2\bin\IceStorm.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -51,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />
+    <Compile Include="iceif.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="hms.cs" />
     <Compile Include="Listener.cs" />

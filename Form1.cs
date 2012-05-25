@@ -10,6 +10,7 @@ using System.Threading;
 using vcCOM;
 using System.Diagnostics;
 
+
 namespace vc2ice
 {
     public partial class Form1 : Form, IvcClient
@@ -18,6 +19,7 @@ namespace vc2ice
         private List<VCRobot> m_robots; 
         private List<Listener> m_listeners ;
         private VCRobot m_rob;
+        private IceApp m_iceapp;
 
         public Form1()
         {
@@ -29,7 +31,9 @@ namespace vc2ice
 
             IvcClient client = (IvcClient)this;
             m_application.addClient(ref client);
-            
+
+            //Ice object
+            m_iceapp = new IceApp();
 
             updateComponentList();                   
         }
@@ -214,10 +218,12 @@ namespace vc2ice
             }
         }
 
-        private void label3_Click(object sender, EventArgs e)
+        private void IceGridRegisterbutton_Click(object sender, EventArgs e)
         {
-
+            Console.WriteLine("Not implemented yet");
         }
+
+
 
     }
 
