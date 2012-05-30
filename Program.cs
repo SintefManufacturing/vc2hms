@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
+using icehms;
 
 namespace vc2ice
 {
@@ -16,11 +15,11 @@ namespace vc2ice
             
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            IceApp iceapp = null;
+            icehms.IceApp iceapp = null;
             VCApp vcapp = null;
             try
             {
-                iceapp = new IceApp();
+                iceapp = new IceApp("VC2IceAdapter", "utopia.sintef.no", 12000);
                 vcapp = new VCApp();
                 Application.Run(new Form1(iceapp, vcapp));
             }

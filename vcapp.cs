@@ -16,7 +16,7 @@ namespace vc2ice
     {
         private IvcApplication m_application;
         public List<VCRobot> Robots;
-        public List<Listener> Signals;
+        public List<VCHolon> Machines;
         private List<VCClient> m_clients;
 
 
@@ -24,13 +24,14 @@ namespace vc2ice
         {
 
             Robots = new List<VCRobot>();
-            Signals = new List<Listener>();
+            Machines = new List<VCHolon>();
             m_clients = new List<VCClient>();
             m_application = (IvcApplication)new vc3DCreate.vcc3DCreate();
 
             IvcClient client = (IvcClient)this;
             m_application.addClient(ref client);  
         }
+
         public void register(VCClient client)
         {
             m_clients.Add(client);
@@ -39,7 +40,13 @@ namespace vc2ice
         public void updateDevicesList()
         {
             Robots.Clear();
-            Signals.Clear();
+            foreach (VCHolon holon in Machines)
+                    {
+                        holon.cleanup();
+                    }
+            Machines.Clear();
+
+
             for (int i = 0; i < m_application.ComponentCount; i++)
             {
                 IvcComponent comp = m_application.getComponent(i);
@@ -56,19 +63,10 @@ namespace vc2ice
                 }
                 // Find machines
                 result = comp.findBehavioursOfType("ComponentSignal");
-                for (int j = 0; j < result.Length; j++)
+                if (result.Length > 0)
                 {
-                    Console.WriteLine(cname + " has component signal!");
-                    Listener listen = new Listener(cname, (IvcPropertyList2)result[j]);
-                    Signals.Add(listen);
+                    Machines.Add(new VCHolon(comp));
 
-                }
-                result = comp.findBehavioursOfType("BooleanSignal");
-                for (int j = 0; j < result.Length; j++)
-                {
-                    Console.WriteLine(cname + " has boolean signal!");
-                    Listener listen = new Listener(cname, (IvcPropertyList2)result[j]);
-                    Signals.Add(listen);
 
                 }
             }

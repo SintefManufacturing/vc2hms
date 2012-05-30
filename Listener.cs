@@ -8,11 +8,14 @@ namespace vc2ice
         IvcPropertyList2 m_Signal;
         String m_ComponentName;
         String m_Type;
+        hms.GenericEventInterfacePrx m_pub;
 
-        public Listener(string componentName, IvcPropertyList2 signal)
+
+        public Listener(string componentName, IvcPropertyList2 signal, icehms.IceApp iceapp)
         {
             m_ComponentName = componentName;
             m_Signal = signal;
+            m_pub = iceapp.getEventPublisher(getID());
             IvcEventProperty l_EProp = (IvcEventProperty)signal.getPropertyObject("Value");
             IvcEventPropertyListener l_Listener = this;
             l_EProp.addListener(ref l_Listener);
@@ -43,8 +46,7 @@ namespace vc2ice
 
 
               if (m_Type == "ComponentSignal")
-              {
-                  
+              {             
                   if (Value != null)
                   {
                       Console.WriteLine(getID() + " got Component Signal of type: " + Value.GetType());
@@ -58,6 +60,13 @@ namespace vc2ice
                           if (comp.RootNode != null)
                           {
                               Helpers.printMatrix("comp pose: ", comp.RootNode.getProperty("WorldPositionMatrix"));
+                              hms.Message msg = new hms.Message();
+                              msg.arguments = new System.Collections.Generic.Dictionary<string, string>();
+                              msg.arguments.Add("ComponentName", m_ComponentName);
+                              msg.arguments.Add("SignalName", m_Type);
+                              msg.arguments.Add("SignalType", m_Type);
+                              msg.arguments.Add("WorldPositionMatrix", (string) comp.RootNode.getProperty("WorldPositionMatrix"));
+                              m_pub.putMessage(msg);
                           }
 
 
@@ -70,7 +79,13 @@ namespace vc2ice
               else
               {
                   Console.WriteLine( getID() + " got Boolean Signal " + (string)m_Signal.getProperty("Name") + "  " + Value.ToString());
-
+                  hms.Message msg = new hms.Message();
+                  msg.arguments = new System.Collections.Generic.Dictionary<string, string>();
+                  msg.arguments.Add("ComponentName", m_ComponentName);
+                  msg.arguments.Add("SignalName", m_Type);
+                  msg.arguments.Add("SignalType", m_Type);
+                  msg.arguments.Add("SignalValue", Value.ToString());
+                  m_pub.putMessage(msg);
               }
           
           }

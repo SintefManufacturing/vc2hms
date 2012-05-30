@@ -16,17 +16,17 @@ namespace vc2ice
     public partial class Form1 : Form, VCClient
     {
 
-        private IceApp m_iceapp;
+        private icehms.IceApp m_iceapp;
         private VCApp m_vcapp;
         private VCRobot m_rob;
 
-        public Form1(IceApp iceapp, VCApp vcapp)
+        public Form1(icehms.IceApp iceapp, VCApp vcapp)
         {
             InitializeComponent(); // MFC component, Windows stuff
 
             m_iceapp = iceapp;
             m_vcapp = vcapp;
-            vcapp.register(this);
+            vcapp.register(this); //get  events from VC
 
             updateComponentList();     
         }
@@ -45,11 +45,9 @@ namespace vc2ice
                 RobotListBox.Items.Add(rob.getName());
 
             }
-            foreach (Listener sig in m_vcapp.Signals)
+            foreach (VCHolon holon in m_vcapp.Machines)
             {
-
-                MachineListBox.Items.Add(sig.getID());
-                MachineListBox.Items.Add(sig.getID());
+                MachineListBox.Items.Add(holon.Name);
             }
         }
 
