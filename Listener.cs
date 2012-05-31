@@ -65,10 +65,10 @@ namespace vc2ice
                               msg.arguments.Add("ComponentName", m_ComponentName);
                               msg.arguments.Add("SignalName", m_Type);
                               msg.arguments.Add("SignalType", m_Type);
-                              msg.arguments.Add("WorldPositionMatrix", (string) comp.RootNode.getProperty("WorldPositionMatrix"));
+                              msg.arguments.Add("WorldPositionMatrix", String.Join(",", comp.RootNode.getProperty("WorldPositionMatrix")));
                               m_pub.putMessage(msg);
                           }
-
+                                                                        
 
                           //Helpers.printMatrix("comp pose: ", comp.RootNode.RootFeature.getProperty("WorldPositionMatrix"));
                       }

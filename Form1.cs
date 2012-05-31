@@ -36,6 +36,7 @@ namespace vc2ice
             Console.WriteLine("Updating component list");
             JointListBox.Items.Clear();
             RobotListBox.Items.Clear();
+            MachineListBox.Items.Clear();
 
             trackBar1.Enabled = false;
             m_vcapp.updateDevicesList();

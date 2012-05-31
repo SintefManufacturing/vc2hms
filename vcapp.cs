@@ -18,11 +18,12 @@ namespace vc2ice
         public List<VCRobot> Robots;
         public List<VCHolon> Machines;
         private List<VCClient> m_clients;
+        private icehms.IceApp IceApp;
 
 
-        public VCApp()
+        public VCApp(icehms.IceApp app)
         {
-
+            IceApp = app;
             Robots = new List<VCRobot>();
             Machines = new List<VCHolon>();
             m_clients = new List<VCClient>();
@@ -37,15 +38,20 @@ namespace vc2ice
             m_clients.Add(client);
         }
 
-        public void updateDevicesList()
+        public void cleanup()
         {
             Robots.Clear();
             foreach (VCHolon holon in Machines)
-                    {
-                        holon.cleanup();
-                    }
+            {
+                holon.shutdown();
+            }
             Machines.Clear();
+        }
 
+        public void updateDevicesList()
+        {
+
+            cleanup();
 
             for (int i = 0; i < m_application.ComponentCount; i++)
             {
@@ -65,7 +71,7 @@ namespace vc2ice
                 result = comp.findBehavioursOfType("ComponentSignal");
                 if (result.Length > 0)
                 {
-                    Machines.Add(new VCHolon(comp));
+                    Machines.Add(new VCHolon(IceApp, comp));
 
 
                 }
