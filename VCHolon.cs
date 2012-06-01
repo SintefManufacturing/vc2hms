@@ -13,7 +13,7 @@ namespace vc2ice
         public List<Listener> Signals;
 
 
-        public VCHolon(icehms.IceApp app, IvcComponent comp) : base(app, (string)comp.getProperty("Name"))
+        public VCHolon(icehms.IceApp app, IvcComponent comp, bool activate=true) : base(app, (string)comp.getProperty("Name"), activate)
         {
             Component = comp;
             //Name = (string)comp.getProperty("Name"); //done in base class

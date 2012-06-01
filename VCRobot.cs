@@ -9,13 +9,16 @@ namespace vc2ice
         private IvcRobot Controller;
         private List<IvcEventProperty> Joints;
         private IvcApplication m_application;
+        private hms.RobotMotionCommandTie_ RobotServant;
+        //public override hms.HolonTie Servant { get; set; }
 
-        public VCRobot(IvcApplication vc, icehms.IceApp app, IvcComponent robot)  : base (app, robot)
+        public VCRobot(IvcApplication vc, icehms.IceApp app, IvcComponent robot)  : base (app, robot, false)
         {
 
-            //we are a robot not only a holon so implement Ice interface thru
-            hms.RobotMotionCommandTie_ servant = new hms.RobotMotionCommandTie_();
-            servant.ice_delegate(this);
+            //we called base with activate=false wo we need to create our own "tie servant"
+            RobotServant = new hms.RobotMotionCommandTie_(this);
+            log("robot servant: " + RobotServant.ice_id());
+            register();
 
             m_application = vc;
             object[] result = Component.findBehavioursOfType("RobotController");
@@ -37,6 +40,12 @@ namespace vc2ice
                 }
             }          
         }
+
+        public override Ice.Object getServant()
+        {
+            return (Ice.Object) RobotServant;
+        }
+
 
         public List<string> getJoints()
         {
