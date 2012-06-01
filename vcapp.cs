@@ -6,6 +6,8 @@ using vcCOM;
 
 namespace vc2ice
 {
+
+
     public interface VCClient
     {
         void VCUpdate();
@@ -63,7 +65,7 @@ namespace vc2ice
                 for (int j = 0; j < result.Length; j++)
                 {
                     Console.WriteLine(cname + " is a robot!");
-                    VCRobot rob = new VCRobot(comp);
+                    VCRobot rob = new VCRobot(m_application, IceApp, comp);
                     Robots.Add(rob);
 
                 }

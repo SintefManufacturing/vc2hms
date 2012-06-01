@@ -14,6 +14,14 @@ namespace vc2ice
             Console.WriteLine("}");
 
         }
+        static public double[] AddMatrix(double[] a, double[] b)
+        {
+           for (int i = 0; i < a.Length; i++)
+            { 
+               a[i] += b[i];
+            }
+           return a;
+        }
 
 
     }

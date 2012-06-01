@@ -83,6 +83,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="ClassDiagram1.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -94,6 +95,15 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <COMReference Include="AccessibilityCplAdminLib">
+      <Guid>{714DD4F6-7676-4BDE-925A-C2FEC2073F36}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
     <COMReference Include="vc3DCreate">
       <Guid>{EA652E80-69BD-49E4-B556-3E476F2B09E8}</Guid>
       <VersionMajor>1</VersionMajor>
@@ -131,7 +141,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties ZerocIce_Enabled="False" ZerocIce_OutputDir="." ZerocIce_Prefix="True" />
+      <UserProperties ZerocIce_VerboseLevel="2" ZerocIce_Enabled="True" ZerocIce_OutputDir="." ZerocIce_Prefix="True" ZerocIce_IncludePath=".\..\..\..\..\icehms\slices" ZerocIce_Tie="True" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -141,15 +151,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <Target Name="CompileSlice" Inputs="hms.ice" Outputs="hms.cs">
-    <Exec Command="slice2cs hms.ice" />
-  </Target>
-  <Target Name="AfterClean">
-    <Delete Files="hms.cs" />
-  </Target>
-  <PropertyGroup>
-    <CompileDependsOn>
-    CompileSlice;$(CompileDependsOn)
-  </CompileDependsOn>
-  </PropertyGroup>
 </Project>

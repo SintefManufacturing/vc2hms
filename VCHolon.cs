@@ -9,7 +9,7 @@ namespace vc2ice
 {
     public class VCHolon : icehms.Holon
     {
-        IvcComponent Component;
+        public IvcComponent Component;
         public List<Listener> Signals;
 
 

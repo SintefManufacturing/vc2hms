@@ -4,93 +4,86 @@ using vcCOM;
 
 namespace vc2ice
 {
-    public class VCRobot
+    public class VCRobot : VCHolon  , hms.RobotMotionCommandOperations_
     {
-        public IvcComponent m_component;
-        public string m_name;
-        private IvcRobot m_controller;
-        private List<IvcEventProperty> m_joints;
+        private IvcRobot Controller;
+        private List<IvcEventProperty> Joints;
+        private IvcApplication m_application;
 
-        public VCRobot(IvcComponent robot)
+        public VCRobot(IvcApplication vc, icehms.IceApp app, IvcComponent robot)  : base (app, robot)
         {
-            m_component = robot;
-            m_name = (string)m_component.getProperty("Name");
-            // find the controller
-            for (int i = 0; i < robot.RootNode.BehaviourCount; ++i)
+
+            //we are a robot not only a holon so implement Ice interface thru
+            hms.RobotMotionCommandTie_ servant = new hms.RobotMotionCommandTie_();
+            servant.ice_delegate(this);
+
+            m_application = vc;
+            object[] result = Component.findBehavioursOfType("RobotController");
+            if (result.Length == 0)
             {
-                IvcBehaviour beh = m_component.RootNode.getBehaviour(i);
-                string btype = (string)beh.getProperty("Type");
-                if ( btype == "RobotController")
-                {
-                    m_controller = (IvcRobot)beh;
-                    //populate the joints list
-                    IvcPropertyList2 compprops = (IvcPropertyList2)m_component;
-                    m_joints = new List<IvcEventProperty>();
-                    for (int k = 0; k < m_controller.JointCount; k++)
-                    {
-                        string jointname = (string)m_controller.getJoint(k).getProperty("Name");
-                        IvcEventProperty joint = (IvcEventProperty)compprops.getPropertyObject(jointname);
-                        m_joints.Add(joint);
-                    }
-                    //we are finished
-                    break;
-                }
+                log("robot without controller found");
             }
-            
-
-        }
-
-        public string getName()
-        {
-            return m_name;
+            else
+            {
+                Controller = (IvcRobot) result[0];
+                // controller is set now populate the joints list
+                IvcPropertyList2 compprops = (IvcPropertyList2)Component;
+                Joints = new List<IvcEventProperty>();
+                for (int k = 0; k < Controller.JointCount; k++)
+                {
+                    string jointname = (string)Controller.getJoint(k).getProperty("Name");
+                    IvcEventProperty joint = (IvcEventProperty)compprops.getPropertyObject(jointname);
+                    Joints.Add(joint);
+                }
+            }          
         }
 
         public List<string> getJoints()
         {
             List<string> list = new List<string>();
-            foreach (IvcEventProperty j in m_joints)
+            foreach (IvcEventProperty j in Joints)
             {
                 list.Add(j.getProperty("Name"));
             }
             return list;
-
         }
 
-        public List<double> getj()
+        public double[] getj(Ice.Current current=null)
         {
             List<double> list = new List<double>();
-            foreach (IvcEventProperty j in m_joints)
+            foreach (IvcEventProperty j in Joints)
             {
                 list.Add(j.Value);
-            }
-            
-            return list;
+            }         
+            return list.ToArray();
         }
+
         public void setJointVal(int idx, double val)
         {
-            m_joints[idx].Value = val;
+            Joints[idx].Value = val;
         }
+
         public double getJointVal(int idx)
         {
-            return m_joints[idx].Value;
+            return Joints[idx].Value;
         }
 
         public void setJointsPos(double[] pose)
         {
-            for(int i=0; i < m_joints.Count; i++)
+            for(int i=0; i < Joints.Count; i++)
             {
                 Console.WriteLine("Moving joint: " + i.ToString() + " to " + pose[i].ToString());
-                IvcEventProperty j = m_joints[i];
+                IvcEventProperty j = Joints[i];
                 j.Value = pose[i];
             }
 
         }
 
-        public void movej(double[] pose, float speed=2)
+        public void movej(double[] pose, double speed = 2, double acc=1, Ice.Current icecurrent=null)
         {
-            Console.WriteLine("Stsrting move"); 
-            IvcMotionInterpolator motion = m_controller.createMotionInterpolator();
-            IvcMotionTarget target = m_controller.createTarget();
+            Console.WriteLine("Starting move"); 
+            IvcMotionInterpolator motion = Controller.createMotionInterpolator();
+            IvcMotionTarget target = Controller.createTarget();
 
             target.TargetMode = 1; // robot base as reference
             target.MotionType = 1; // Linear
@@ -144,6 +137,90 @@ namespace vc2ice
 
         }
 
+        public double[] getl(hms.RobotCoordinateSystem cref = hms.RobotCoordinateSystem.World, Ice.Current current = null)
+        {
+            IvcMotionInterpolator motion = Controller.createMotionInterpolator();
+            IvcMotionTarget target = Controller.createTarget();
+            double[] matrix;
+            switch (cref)
+            {
+                case hms.RobotCoordinateSystem.Base:
+                    return target.RobotRootToRobotFlangeMatrix;
+                case hms.RobotCoordinateSystem.World:
+                    matrix = Helpers.AddMatrix(target.WorldToRootNodeMatrix, target.RootNodeToRobotRootMatrix );
+                    matrix = Helpers.AddMatrix(matrix, target.RobotRootToRobotFlangeMatrix );
+                    return matrix;
+                default:
+                    goto case hms.RobotCoordinateSystem.World;
+                    
+            }
+
+
+        }
+
+
+        public void movel(double[] pose, double speed = 2, double acc = 1, hms.RobotCoordinateSystem cref = hms.RobotCoordinateSystem.World, Ice.Current icecurrent = null)
+        {
+            Console.WriteLine("Starting move");
+            IvcMotionInterpolator motion = Controller.createMotionInterpolator();
+            IvcMotionTarget target = Controller.createTarget();
+          
+            target.MotionType = 0; // 1 is Linear, 0 joint
+            switch (cref)
+            {
+                case hms.RobotCoordinateSystem.Base:
+                    target.TargetMode = 1; // robot base as reference
+                    break;
+                case hms.RobotCoordinateSystem.World:
+                    target.TargetMode = 4; //  world as reference
+                    break;
+                default:
+                    goto case hms.RobotCoordinateSystem.World;
+                    
+            }
+            double[] current = target.RobotRootToRobotFlangeMatrix;
+
+            //adding start point to trajectory
+            target.TargetMatrix = current;
+            motion.addTarget(ref target);
+            target.CurrentConfig = target.NearestConfig;
+
+            //Now the real target
+            target.TargetMatrix = pose;
+            motion.addTarget(ref target);
+            printMatrix("Setting target to : ", current);
+
+            Console.WriteLine("Is target reachable 1: " + target.getConfigWarning(motion.TargetCount - 1));
+
+            double endTime = motion.getCycleTimeAtTarget(motion.TargetCount - 1);
+            Console.WriteLine("Computed time: " + Convert.ToString(endTime));
+            Console.WriteLine("Starting move");
+            double[] bjoints = new double[6];
+            double movestart = m_application.getProperty("SimTime");
+            double moveend = movestart + endTime;
+            double now = movestart;
+            double relnow;
+            while (now <= moveend)
+            {
+                now = m_application.getProperty("SimTime");
+                relnow = now - movestart;                
+                motion.interpolate(relnow, ref target);
+                for (int i = 0; i < target.RobotJointCount; i++)
+                {
+                    bjoints[i] = target.getJointValue(i);
+                }
+                setJointsPos(bjoints);
+            }
+            Console.WriteLine("Target reached");
+        }
+
+
+
+
+
+
+
+
         public void printMatrix(string header, double[] a)
         {
             Console.Write(header + ": {");
@@ -158,7 +235,7 @@ namespace vc2ice
             while (true)
             {
 
-                m_joints[0].Value = Math.Sin(i) * 90;
+                Joints[0].Value = Math.Sin(i) * 90;
                 i += 0.1;
                 //fm.m_application.render();
 
