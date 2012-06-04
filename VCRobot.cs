@@ -4,21 +4,19 @@ using vcCOM;
 
 namespace vc2ice
 {
-    public class VCRobot : VCHolon  , hms.RobotMotionCommandOperations_
+    public class VCRobot : VCMachine  , hms.RobotMotionCommandOperations_
     {
         private IvcRobot Controller;
         private List<IvcEventProperty> Joints;
         private IvcApplication m_application;
-        private hms.RobotMotionCommandTie_ RobotServant;
+        //private hms.RobotMotionCommandTie_ RobotServant;
         //public override hms.HolonTie Servant { get; set; }
 
         public VCRobot(IvcApplication vc, icehms.IceApp app, IvcComponent robot)  : base (app, robot, false)
         {
 
             //we called base with activate=false wo we need to create our own "tie servant"
-            RobotServant = new hms.RobotMotionCommandTie_(this);
-            log("robot servant: " + RobotServant.ice_id());
-            register();
+            register((Ice.Object)new hms.RobotMotionCommandTie_(this));
 
             m_application = vc;
             object[] result = Component.findBehavioursOfType("RobotController");
@@ -41,10 +39,7 @@ namespace vc2ice
             }          
         }
 
-        public override Ice.Object getServant()
-        {
-            return (Ice.Object) RobotServant;
-        }
+
 
 
         public List<string> getJoints()
@@ -96,16 +91,6 @@ namespace vc2ice
 
             target.TargetMode = 1; // robot base as reference
             target.MotionType = 1; // Linear
-            //target.BaseMatrix = new double[] {1250, 0, -25, 0,0,0};
-            //target.ToolMatrix = new double[] { 39, 198, 180, 0, 0, -90 };
-            Console.WriteLine("Nb joints: " + target.RobotJointCount);
-            Console.WriteLine("Nb bases: " + target.NamedBaseCount);
-            printMatrix("Root Node position in World: ", target.WorldToRootNodeMatrix);         
-            printMatrix("Robot position in Root Nove: ", target.RootNodeToRobotRootMatrix);
-            printMatrix("Flange position n Robot Root: ", target.RobotRootToRobotFlangeMatrix);
-            printMatrix("Positioner Root to Positioner Flange: ", target.PositionerRootToPositionerFlangeMatrix);
-            Console.WriteLine("Number of possible coinfigurations: " + target.ConfigCount);
-            Console.WriteLine("Accuracy Value: " + target.AccuracyValue);
             double[] current = target.RobotRootToRobotFlangeMatrix;
             //adding start point to trajectory
             target.TargetMatrix = current;
@@ -113,11 +98,12 @@ namespace vc2ice
             target.CurrentConfig = target.NearestConfig;
             
             //Now the real target
+            for (int i=0; i < pose.Length; i++)
+            {
+                target.setJointValue(i, pose[i]);
+            }
 
-            current[2] -= 500;
-            target.TargetMatrix = current;
-            motion.addTarget(ref target);
-            printMatrix("Setting target to : ", current);
+            motion.addTarget(ref  target);
 
 
             Console.WriteLine("Is target reachable: " + target.getConfigWarning(0));
@@ -142,25 +128,31 @@ namespace vc2ice
                 }
                 setJointsPos(bjoints);
             }
+            // make sure we reach the final destination, even after approximation
+            for (int i = 0; i < target.RobotJointCount; i++)
+            {
+                bjoints[i] = target.getJointValue(i);
+            }
+            setJointsPos(bjoints);
             Console.WriteLine("Target reached");
 
         }
 
-        public double[] getl(hms.RobotCoordinateSystem cref = hms.RobotCoordinateSystem.World, Ice.Current current = null)
+        public double[] getl(hms.CSYS cref, Ice.Current current = null)
         {
             IvcMotionInterpolator motion = Controller.createMotionInterpolator();
             IvcMotionTarget target = Controller.createTarget();
             double[] matrix;
             switch (cref)
             {
-                case hms.RobotCoordinateSystem.Base:
+                case hms.CSYS.Base:
                     return target.RobotRootToRobotFlangeMatrix;
-                case hms.RobotCoordinateSystem.World:
+                case hms.CSYS.World:
                     matrix = Helpers.AddMatrix(target.WorldToRootNodeMatrix, target.RootNodeToRobotRootMatrix );
                     matrix = Helpers.AddMatrix(matrix, target.RobotRootToRobotFlangeMatrix );
                     return matrix;
                 default:
-                    goto case hms.RobotCoordinateSystem.World;
+                    goto case hms.CSYS.World;
                     
             }
 
@@ -168,7 +160,7 @@ namespace vc2ice
         }
 
 
-        public void movel(double[] pose, double speed = 2, double acc = 1, hms.RobotCoordinateSystem cref = hms.RobotCoordinateSystem.World, Ice.Current icecurrent = null)
+        public void movel(double[] pose, double speed = 2, double acc = 1, hms.CSYS cref = hms.CSYS.World, Ice.Current icecurrent = null)
         {
             Console.WriteLine("Starting move");
             IvcMotionInterpolator motion = Controller.createMotionInterpolator();
@@ -177,14 +169,14 @@ namespace vc2ice
             target.MotionType = 0; // 1 is Linear, 0 joint
             switch (cref)
             {
-                case hms.RobotCoordinateSystem.Base:
+                case hms.CSYS.Base:
                     target.TargetMode = 1; // robot base as reference
                     break;
-                case hms.RobotCoordinateSystem.World:
+                case hms.CSYS.World:
                     target.TargetMode = 4; //  world as reference
                     break;
                 default:
-                    goto case hms.RobotCoordinateSystem.World;
+                    goto case hms.CSYS.World;
                     
             }
             double[] current = target.RobotRootToRobotFlangeMatrix;
@@ -220,6 +212,12 @@ namespace vc2ice
                 }
                 setJointsPos(bjoints);
             }
+            // make sure we reach the final destination, even after approximation
+            for (int i = 0; i < target.RobotJointCount; i++)
+            {
+                bjoints[i] = target.getJointValue(i);
+            }
+            setJointsPos(bjoints);
             Console.WriteLine("Target reached");
         }
 

@@ -7,13 +7,13 @@ using vcCOM;
 
 namespace vc2ice
 {
-    public class VCHolon : icehms.Holon
+    public class VCMachine : icehms.Holon
     {
         public IvcComponent Component;
         public List<Listener> Signals;
 
 
-        public VCHolon(icehms.IceApp app, IvcComponent comp, bool activate=true) : base(app, (string)comp.getProperty("Name"), activate)
+        public VCMachine(icehms.IceApp app, IvcComponent comp, bool activate=true) : base(app, (string)comp.getProperty("Name"), activate)
         {
             Component = comp;
             //Name = (string)comp.getProperty("Name"); //done in base class
