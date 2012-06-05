@@ -1,24 +1,179 @@
 ﻿using System;
 using System.Collections.Generic;
 using vcCOM;
+using vcCOMExecutor;
 
 namespace vc2ice
 {
-    public class VCRobot : VCMachine  , hms.RobotMotionCommandOperations_
+    [Serializable]
+    public class UnreachableException : Exception
+    {
+        public string ErrorMessage
+        {
+            get
+            {
+                return base.Message.ToString();
+            }
+        }
+
+        public UnreachableException(string errorMessage)
+            : base(errorMessage) { }
+
+        public UnreachableException(string errorMessage, Exception innerEx)
+            : base(errorMessage, innerEx) { }
+    }
+
+    public enum MoveType { Linear, Joint };
+    public class Move
+    {
+        IvcMotionInterpolator Motion;
+        IvcMotionTarget Target;
+        private IvcRobot Controller;
+        
+        double StartTime; 
+        double EndTime;
+        IvcApplication  App;
+        hms.CSYS CSRef;
+
+        public Move(IvcApplication app, MoveType move, IvcRobot controller, double[] pose, double speed = 2, double acc = 1, hms.CSYS cref = hms.CSYS.World)
+        {
+            Controller = controller;
+            Motion = Controller.createMotionInterpolator();
+            Target = Controller.createTarget();
+            CSRef = cref;
+
+            App = app;
+
+            if (move == MoveType.Linear)
+            {
+                setupLinearMove(pose);
+            }
+            else
+            {
+                setupJointMove(pose);
+            }
+
+
+            Console.WriteLine("Is target reachable: " + Target.getConfigWarning(Motion.TargetCount - 1));
+            if ( Target.getConfigWarning(Motion.TargetCount - 1) == 1) 
+            {
+               throw(new UnreachableException("Target is not reachable"));
+            }
+
+            double end = Motion.getCycleTimeAtTarget(Motion.TargetCount - 1);
+            Console.WriteLine("Computed time: " + Convert.ToString(end));
+            Console.WriteLine("Starting move");
+
+            StartTime = App.getProperty("SimTime");
+            EndTime = StartTime + end;
+        }
+
+        public void setupLinearMove(double[] pose)
+        {
+            Target.MotionType = 1; // 1 is Linear, 0 joint
+            switch (CSRef)
+            {
+                case hms.CSYS.Base:
+                    Target.TargetMode = 1; // robot base as reference
+                    break;
+                case hms.CSYS.World:
+                    Target.TargetMode = 4; //  world as reference
+                    break;
+                default:
+                    goto case hms.CSYS.World;
+
+            }
+            double[] current = Target.RobotRootToRobotFlangeMatrix;
+
+            //adding start point to trajectory
+            Target.TargetMatrix = current;
+            Motion.addTarget(ref Target);
+            Target.CurrentConfig = Target.NearestConfig;
+
+            //Now the real target
+            Target.TargetMatrix = pose;
+            Motion.addTarget(ref Target);
+        }
+
+        public void setupJointMove(double[] pose)
+        {
+            Target.MotionType = 0; // 1 is Linear, 0 joint
+            Target.TargetMode = 1; // robot base as reference
+
+            double[] current = Target.RobotRootToRobotFlangeMatrix;
+
+            //adding start point to trajectory
+            Target.TargetMatrix = current;
+            Motion.addTarget(ref Target);
+            Target.CurrentConfig = Target.NearestConfig;
+
+            //Now the real target
+            for (int i = 0; i < pose.Length; i++)
+            {
+                Target.setJointValue(i, pose[i]);
+            }
+            Motion.addTarget(ref  Target);
+        }
+
+
+        public bool isFinished()
+        {
+            double t = App.getProperty("SimTime");
+            if (t > EndTime ) 
+            {
+                return true;
+            }
+            else{
+                return false;
+            }
+
+        }
+
+        public double[] getPose()
+        {
+            double[] bjoints = new double[Controller.JointCount];
+            double now = App.getProperty("SimTime");
+            if (now > EndTime)
+            {
+                now = EndTime;
+            }
+            now =  now - StartTime;
+            try
+            {
+                Motion.interpolate(now, ref Target);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Interpolation error: " + ex);
+            }
+            for (int i = 0; i < Target.RobotJointCount; i++)
+            {
+                bjoints[i] = Target.getJointValue(i);
+            }
+            Helpers.printMatrix("Interpolated joint pose is: ", bjoints);
+            return bjoints;
+        }  
+    }
+    
+
+ 
+    public class VCRobot : VCMachine, hms.RobotMotionCommandOperations_, IvcExecutorClient
     {
         private IvcRobot Controller;
         private List<IvcEventProperty> Joints;
-        private IvcApplication m_application;
+        private IvcApplication App;
         //private hms.RobotMotionCommandTie_ RobotServant;
         //public override hms.HolonTie Servant { get; set; }
+        private IvcExecutor Executor;
+        private Move CurrentMove;
 
         public VCRobot(IvcApplication vc, icehms.IceApp app, IvcComponent robot)  : base (app, robot, false)
         {
 
-            //we called base with activate=false wo we need to create our own "tie servant"
+            //we called base with activate=false so we need to create our own "tie servant"
             register((Ice.Object)new hms.RobotMotionCommandTie_(this));
 
-            m_application = vc;
+            App = vc;
             object[] result = Component.findBehavioursOfType("RobotController");
             if (result.Length == 0)
             {
@@ -36,7 +191,14 @@ namespace vc2ice
                     IvcEventProperty joint = (IvcEventProperty)compprops.getPropertyObject(jointname);
                     Joints.Add(joint);
                 }
-            }          
+            } 
+         
+            //executor stuff
+            result = Component.findBehavioursOfType("RslExecutor");
+            Executor = (IvcExecutor) result[0];  
+            Executor.addExecutorClient(this);
+            ((IvcPropertyList)Executor).setProperty("ExecutionMode", true);  //we are ready
+
         }
 
 
@@ -76,7 +238,7 @@ namespace vc2ice
         {
             for(int i=0; i < Joints.Count; i++)
             {
-                Console.WriteLine("Moving joint: " + i.ToString() + " to " + pose[i].ToString());
+                //Console.WriteLine("Moving joint: " + i.ToString() + " to " + pose[i].ToString());
                 IvcEventProperty j = Joints[i];
                 j.Value = pose[i];
             }
@@ -85,58 +247,14 @@ namespace vc2ice
 
         public void movej(double[] pose, double speed = 2, double acc=1, Ice.Current icecurrent=null)
         {
-            Console.WriteLine("Starting move"); 
-            IvcMotionInterpolator motion = Controller.createMotionInterpolator();
-            IvcMotionTarget target = Controller.createTarget();
-
-            target.TargetMode = 1; // robot base as reference
-            target.MotionType = 1; // Linear
-            double[] current = target.RobotRootToRobotFlangeMatrix;
-            //adding start point to trajectory
-            target.TargetMatrix = current;
-            motion.addTarget(ref target);
-            target.CurrentConfig = target.NearestConfig;
-            
-            //Now the real target
-            for (int i=0; i < pose.Length; i++)
+            log("New joint move command: ");
+            lock (this)
             {
-                target.setJointValue(i, pose[i]);
+                CurrentMove = new Move(App, MoveType.Joint, Controller, pose, speed, acc);
             }
-
-            motion.addTarget(ref  target);
-
-
-            Console.WriteLine("Is target reachable: " + target.getConfigWarning(0));
-            Console.WriteLine("Is target reachable 1: " + target.getConfigWarning(motion.TargetCount - 1));
-            Console.WriteLine(target.CurrentConfig);
-            Console.WriteLine(target.NearestConfig);
-            double endTime = motion.getCycleTimeAtTarget(motion.TargetCount - 1);
-            Console.WriteLine("Computed time: " + Convert.ToString( endTime));
-            Console.WriteLine("Starting move");
-            printMatrix("t 1  ", motion.getTarget(0).TargetMatrix);
-            printMatrix("t 2  ", motion.getTarget(1).TargetMatrix);
-            double[] bjoints = new double[6];
-            for (double time=0; time <= endTime; time += 0.01)
-            {
-                motion.interpolate(time, ref target);
-                //.WriteLine("Config: " + target.CurrentConfig);
-                printMatrix("Current pose: ", target.TargetMatrix);
-                //Console.WriteLine(target.getConfigWarning(target.CurrentConfig));
-                for (int i = 0; i < target.RobotJointCount; i++)
-                {
-                    bjoints[i] = target.getJointValue(i);
-                }
-                setJointsPos(bjoints);
-            }
-            // make sure we reach the final destination, even after approximation
-            for (int i = 0; i < target.RobotJointCount; i++)
-            {
-                bjoints[i] = target.getJointValue(i);
-            }
-            setJointsPos(bjoints);
-            Console.WriteLine("Target reached");
-
         }
+
+
 
         public double[] getl(hms.CSYS cref, Ice.Current current = null)
         {
@@ -160,93 +278,106 @@ namespace vc2ice
         }
 
 
-        public void movel(double[] pose, double speed = 2, double acc = 1, hms.CSYS cref = hms.CSYS.World, Ice.Current icecurrent = null)
+
+
+
+        public void movel(double[] pose, double speed = 2, double acc = 1, hms.CSYS cref=hms.CSYS.World, Ice.Current icecurrent = null)
         {
-            Console.WriteLine("Starting move");
-            IvcMotionInterpolator motion = Controller.createMotionInterpolator();
-            IvcMotionTarget target = Controller.createTarget();
-          
-            target.MotionType = 0; // 1 is Linear, 0 joint
-            switch (cref)
+            log("New move command: ");
+            lock (this)
             {
-                case hms.CSYS.Base:
-                    target.TargetMode = 1; // robot base as reference
-                    break;
-                case hms.CSYS.World:
-                    target.TargetMode = 4; //  world as reference
-                    break;
-                default:
-                    goto case hms.CSYS.World;
-                    
+                CurrentMove = new Move(App, MoveType.Linear, Controller, pose, speed, acc, cref);
             }
-            double[] current = target.RobotRootToRobotFlangeMatrix;
+        }
 
-            //adding start point to trajectory
-            target.TargetMatrix = current;
-            motion.addTarget(ref target);
-            target.CurrentConfig = target.NearestConfig;
 
-            //Now the real target
-            target.TargetMatrix = pose;
-            motion.addTarget(ref target);
-            printMatrix("Setting target to : ", current);
 
-            Console.WriteLine("Is target reachable 1: " + target.getConfigWarning(motion.TargetCount - 1));
+        public void notifyBinaryInputValueChange(int Index, bool Value)
+        {
 
-            double endTime = motion.getCycleTimeAtTarget(motion.TargetCount - 1);
-            Console.WriteLine("Computed time: " + Convert.ToString(endTime));
-            Console.WriteLine("Starting move");
-            double[] bjoints = new double[6];
-            double movestart = m_application.getProperty("SimTime");
-            double moveend = movestart + endTime;
-            double now = movestart;
-            double relnow;
-            while (now <= moveend)
+        }
+
+        public void notifyIntegerInputValueChange(int Index, int Value)
+        {
+
+        }
+
+        public void notifyJointReportInterval(int Interval)
+        {
+
+        }
+
+        public void notifyRealInputValueChange(int Index, double Value)
+        {
+
+        }
+
+        public void notifyReset()
+        {
+
+        }
+
+        public void notifyRun(int Time)
+        {
+            //do something for amount of given time then call freese
+            //log("Run method: " + Time);
+            lock (this)
             {
-                now = m_application.getProperty("SimTime");
-                relnow = now - movestart;                
-                motion.interpolate(relnow, ref target);
-                for (int i = 0; i < target.RobotJointCount; i++)
+                if (CurrentMove != null)
                 {
-                    bjoints[i] = target.getJointValue(i);
+                    log("Run method: moving");
+                    setJointsPos(CurrentMove.getPose());
+                    if (CurrentMove.isFinished())
+                    {
+                        CurrentMove = null;
+                    }
                 }
-                setJointsPos(bjoints);
             }
-            // make sure we reach the final destination, even after approximation
-            for (int i = 0; i < target.RobotJointCount; i++)
+            Executor.freeze();
+
+        }
+        public bool isMoving(Ice.Current icecurrent = null)
+        {
+            if (CurrentMove != null)
             {
-                bjoints[i] = target.getJointValue(i);
+                return ! CurrentMove.isFinished();
             }
-            setJointsPos(bjoints);
-            Console.WriteLine("Target reached");
+            return false;
         }
 
-
-
-
-
-
-
-
-        public void printMatrix(string header, double[] a)
+        public void notifyStartSimulation()
         {
-            Console.Write(header + ": {");
-             for (int i = 0; i < a.Length; i++) { Console.Write(a[i] + "  "); }
-            Console.WriteLine("}");
-            
+
         }
 
-        public void move()
+        public void notifyStopSimulation()
         {
-            double i = 0.0;
-            while (true)
-            {
+ 
+        }
 
-                Joints[0].Value = Math.Sin(i) * 90;
-                i += 0.1;
-                //fm.m_application.render();
+        public void notifyStringInputValueChange(int Index, string Value)
+        {
 
-            }
+        }
+
+        public void queryBinaryIOConfiguration(ref int Inputs, ref int Outputs)
+        {
+
+        }
+
+        public void queryIntegerIOConfiguration(ref int Inputs, ref int Outputs)
+        {
+
+        }
+
+        public void queryRealIOConfiguration(ref int Inputs, ref int Outputs)
+        {
+
+        }
+
+        public void queryStringIOConfiguration(ref int Inputs, ref int Outputs)
+        {
+ 
         }
     }
 
