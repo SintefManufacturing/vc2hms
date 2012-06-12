@@ -97,6 +97,10 @@ namespace vc2ice
                     Console.WriteLine(cname + " is a robot!");
                     VCRobot rob = new VCRobot(Application, IceApp, comp);
                     Robots.Add(rob);
+                    //double[] q = rob.getj();
+                    //q[0] += 100;
+                    //rob.movej(q, 2, 2);
+                    //rob.setDigitalOut(1, true);
                     registered = true;
 
                 }

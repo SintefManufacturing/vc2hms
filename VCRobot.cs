@@ -54,11 +54,14 @@ namespace vc2ice
             }
 
 
-            Console.WriteLine("Is target reachable: " + Target.getConfigWarning(Motion.TargetCount - 1));
-            if ( Target.getConfigWarning(Motion.TargetCount - 1) == 1) 
-            {
-               throw(new UnreachableException("Target is not reachable"));
-            }
+            //Console.WriteLine("Is target reachable: " + Target.getConfigWarning(Motion.TargetCount - 1));
+            //Target.getConfigWarning(0);
+            //Target.getConfigWarning(1);
+
+            //if ( Target.getConfigWarning(Motion.TargetCount - 1) == 1) 
+            //{
+            //   throw(new UnreachableException("Target is not reachable"));
+            //}
 
             double end = Motion.getCycleTimeAtTarget(Motion.TargetCount - 1);
             Console.WriteLine("Computed time: " + Convert.ToString(end));
@@ -166,6 +169,9 @@ namespace vc2ice
         //public override hms.HolonTie Servant { get; set; }
         private IvcExecutor Executor;
         private Move CurrentMove;
+        private IvcSignalMap DigitalInput;
+        private IvcSignalMap DigitalOutput;
+
 
         public VCRobot(IvcApplication vc, icehms.IceApp app, IvcComponent robot)  : base (app, robot)
         {
@@ -191,15 +197,21 @@ namespace vc2ice
                     IvcEventProperty joint = (IvcEventProperty)compprops.getPropertyObject(jointname);
                     Joints.Add(joint);
                 }
-            } 
-         
+            }          
             //executor stuff
             result = Component.findBehavioursOfType("RslExecutor");
             Executor = (IvcExecutor) result[0];  
             Executor.addExecutorClient(this);
             ((IvcPropertyList)Executor).setProperty("ExecutionMode", true);  //we are ready
-
+            string name = ((IvcPropertyList)Executor).getProperty("DigitalMapIn");
+            DigitalInput = (IvcSignalMap) Component.findBehaviour(name);
+            log("nf ports; "+ DigitalInput.PortCount);
+            name = ((IvcPropertyList)Executor).getProperty("DigitalMapOut");
+            log("mapout is: " + name);
+            DigitalOutput = (IvcSignalMap)Component.findBehaviour("Outputs");
+            log("nf ports output; " + DigitalOutput.PortCount);
         }
+
 
 
         public List<string> getJoints()
@@ -328,6 +340,7 @@ namespace vc2ice
                     }
                 }
             }
+            App.render();
             Executor.freeze();
 
         }
@@ -377,44 +390,46 @@ namespace vc2ice
 
 
 
-        public void setDigitalOut(int nb, bool val, Ice.Current current__)
+        public void setDigitalOut(int nb, bool val, Ice.Current current__=null)
+        {
+            IvcSignal sig =   DigitalOutput.getPortSignal(nb);
+            sig.setProperty("Value", val);
+        }
+
+        public void setAnalogOut(int nb, bool val, Ice.Current current__=null)
         {
             throw new NotImplementedException();
         }
 
-        public void setAnalogOut(int nb, bool val, Ice.Current current__)
+        public bool getDigitalInput(int nb, Ice.Current current__=null)
+        {
+            IvcSignal sig = DigitalOutput.getPortSignal(nb);
+            return sig.getProperty("Value");
+        }
+
+        public bool getAnalogInput(int nb, Ice.Current current__=null)
         {
             throw new NotImplementedException();
         }
 
-        public bool getDigitalInput(int nb, Ice.Current current__)
+        public void setTool(int tool, Ice.Current current__=null)
         {
             throw new NotImplementedException();
         }
 
-        public bool getAnalogInput(int nb, Ice.Current current__)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void setTool(int tool, Ice.Current current__)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void setTCP(double[] tcp, Ice.Current current__)
+        public void setTCP(double[] tcp, Ice.Current current__=null)
         {
             throw new NotImplementedException();
         }
 
         public void grasp(Ice.Current current__)
         {
-            throw new NotImplementedException();
+            setDigitalOut(1, true);
         }
 
         public void release(Ice.Current current__)
         {
-            throw new NotImplementedException();
+            setDigitalOut(1, false);
         }
 
 
