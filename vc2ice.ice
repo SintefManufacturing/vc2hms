@@ -11,7 +11,7 @@ module hms {
         void reset();
     };
 
-	interface Robot extends RobotMotionCommand {
+	interface Robot extends GenericRobot {
         
     };
 
@@ -23,9 +23,9 @@ module hms {
 	interface Feeder extends Holon {
         void start();
         void stop();
-        void setSequence(DoubleSeq); //a sequence of double representing the frequency for every object prpoduced by the feeder
+        void setSequence(DoubleSeq feedseq); //a sequence of double representing the frequency for every object prpoduced by the feeder
     };
-}
+};
 
 
 #endif 
