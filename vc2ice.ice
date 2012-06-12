@@ -11,16 +11,25 @@ module hms {
         void reset();
     };
 
+	interface VCComponent extends Holon {
+		string getProperty(string name);
+		StringSeq getPropertyList();
+		void setProperty(string name, string val);
+	};
+
 	interface Robot extends GenericRobot {
+		string getProperty(string name);
+		StringSeq getPropertyList();
+		void setProperty(string name, string val);
         
     };
 
-	interface Conveyor extends Holon {
+	interface Conveyor extends VCComponent {
         void start();
         void stop();
     };
 
-	interface Feeder extends Holon {
+	interface Feeder extends VCComponent {
         void start();
         void stop();
         void setSequence(DoubleSeq feedseq); //a sequence of double representing the frequency for every object prpoduced by the feeder

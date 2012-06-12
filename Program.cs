@@ -19,7 +19,7 @@ namespace vc2ice
             VCApp vcapp = null;
             try
             {
-                iceapp = new IceApp("VC2IceAdapter", "utopia.sintef.no", 12000);
+                iceapp = new IceApp("VC2IceAdapter", "utopia.sintef.no", 12000, false);
                 vcapp = new VCApp(iceapp);
                 Application.Run(new Form1(iceapp, vcapp));
             }

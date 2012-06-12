@@ -157,7 +157,7 @@ namespace vc2ice
     
 
  
-    public class VCRobot : VCMachine, hms.RobotMotionCommandOperations_, IvcExecutorClient
+    public class VCRobot : VCComponent, hms.RobotOperations_, IvcExecutorClient
     {
         private IvcRobot Controller;
         private List<IvcEventProperty> Joints;
@@ -167,11 +167,11 @@ namespace vc2ice
         private IvcExecutor Executor;
         private Move CurrentMove;
 
-        public VCRobot(IvcApplication vc, icehms.IceApp app, IvcComponent robot)  : base (app, robot, false)
+        public VCRobot(IvcApplication vc, icehms.IceApp app, IvcComponent robot)  : base (app, robot)
         {
 
             //we called base with activate=false so we need to create our own "tie servant"
-            register((Ice.Object)new hms.RobotMotionCommandTie_(this));
+            register((Ice.Object)new hms.RobotTie_(this));
 
             App = vc;
             object[] result = Component.findBehavioursOfType("RobotController");
@@ -200,8 +200,6 @@ namespace vc2ice
             ((IvcPropertyList)Executor).setProperty("ExecutionMode", true);  //we are ready
 
         }
-
-
 
 
         public List<string> getJoints()
@@ -270,11 +268,8 @@ namespace vc2ice
                     matrix = Helpers.AddMatrix(matrix, target.RobotRootToRobotFlangeMatrix );
                     return matrix;
                 default:
-                    goto case hms.CSYS.World;
-                    
+                    goto case hms.CSYS.World;       
             }
-
-
         }
 
 
@@ -336,7 +331,7 @@ namespace vc2ice
             Executor.freeze();
 
         }
-        public bool isMoving(Ice.Current icecurrent = null)
+        public bool isProgramRunning(Ice.Current icecurrent = null)
         {
             if (CurrentMove != null)
             {
@@ -379,6 +374,50 @@ namespace vc2ice
         {
  
         }
+
+
+
+        public void setDigitalOut(int nb, bool val, Ice.Current current__)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void setAnalogOut(int nb, bool val, Ice.Current current__)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool getDigitalInput(int nb, Ice.Current current__)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool getAnalogInput(int nb, Ice.Current current__)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void setTool(int tool, Ice.Current current__)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void setTCP(double[] tcp, Ice.Current current__)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void grasp(Ice.Current current__)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void release(Ice.Current current__)
+        {
+            throw new NotImplementedException();
+        }
+
+
     }
 
 }

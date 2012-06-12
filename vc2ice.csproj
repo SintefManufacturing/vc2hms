@@ -58,7 +58,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="VCHolon.cs" />
+    <Compile Include="vc2ice.cs" />
+    <Compile Include="VCComponent.cs" />
     <Compile Include="vcapp.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="Listener.cs" />
@@ -93,6 +94,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="vc2ice.ice" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="AccessibilityCplAdminLib">
@@ -150,7 +152,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties ZerocIce_Tie="True" ZerocIce_IncludePath=".\..\..\..\..\icehms\slices" ZerocIce_Prefix="True" ZerocIce_OutputDir="." ZerocIce_Enabled="True" ZerocIce_VerboseLevel="2" />
+      <UserProperties ZerocIce_VerboseLevel="2" ZerocIce_Enabled="True" ZerocIce_OutputDir="." ZerocIce_Prefix="True" ZerocIce_IncludePath="C:\Users\olrd\Documents\icehms\slices|C:\Users\olrd\Documents\Visual Studio 2010\Projects\vc2ice\vc2ice" ZerocIce_Tie="True" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

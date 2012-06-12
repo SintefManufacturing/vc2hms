@@ -14,25 +14,54 @@ namespace vc2ice
 
     }
 
-    public class VCApp: IvcClient
+    public class VCAppHolon : icehms.Holon, hms.SimulationOperations_
     {
-        private IvcApplication m_application;
+        private VCApp vcApp;
+
+        public VCAppHolon(VCApp vcapp, icehms.IceApp iceapp)  :  base(iceapp, (string)vcapp.Application.getProperty("ApplicationName") , false)
+        {
+            //we called base with activate=false so we need to create our own "tie servant"
+            register((Ice.Object)new hms.SimulationTie_(this));
+            vcApp = vcapp;
+        }
+
+        public void start(Ice.Current current__)
+        {
+            vcApp.Application.setProperty("SimulationRunning", true);
+        }
+
+        public void stop(Ice.Current current__)
+        {
+            vcApp.Application.setProperty("SimulationRunning", false);
+        }
+
+        public void reset(Ice.Current current__)
+        {
+            IvcCommand l_restart = vcApp.Application.getCommand("resetSimulation");
+            l_restart.start();
+        }
+
+    }
+
+    public class VCApp: IvcClient  
+    {
+        public IvcApplication Application;
         public List<VCRobot> Robots;
-        public List<VCMachine> Machines;
+        public List<VCComponent> Components;
         private List<VCClient> m_clients;
         private icehms.IceApp IceApp;
 
 
-        public VCApp(icehms.IceApp app)
+        public VCApp(icehms.IceApp app)  
         {
             IceApp = app;
             Robots = new List<VCRobot>();
-            Machines = new List<VCMachine>();
+            Components = new List<VCComponent>();
             m_clients = new List<VCClient>();
-            m_application = (IvcApplication)new vc3DCreate.vcc3DCreate();
+            Application = (IvcApplication)new vc3DCreate.vcc3DCreate();
 
             IvcClient client = (IvcClient)this;
-            m_application.addClient(ref client);  
+            Application.addClient(ref client);  
         }
 
         public void register(VCClient client)
@@ -43,11 +72,11 @@ namespace vc2ice
         public void cleanup()
         {
             Robots.Clear();
-            foreach (VCMachine holon in Machines)
+            foreach (VCComponent holon in Components)
             {
                 holon.shutdown();
             }
-            Machines.Clear();
+            Components.Clear();
         }
 
         public void updateDevicesList()
@@ -55,27 +84,31 @@ namespace vc2ice
 
             cleanup();
 
-            for (int i = 0; i < m_application.ComponentCount; i++)
+            for (int i = 0; i < Application.ComponentCount; i++)
             {
-                IvcComponent comp = m_application.getComponent(i);
+                IvcComponent comp = Application.getComponent(i);
                 string cname = (string)comp.getProperty("Name");
                 Console.WriteLine("Studying:    " + cname);
                 // find robots
                 object[] result = comp.findBehavioursOfType("RobotController");
+                bool registered = false;
                 for (int j = 0; j < result.Length; j++)
                 {
                     Console.WriteLine(cname + " is a robot!");
-                    VCRobot rob = new VCRobot(m_application, IceApp, comp);
+                    VCRobot rob = new VCRobot(Application, IceApp, comp);
                     Robots.Add(rob);
+                    registered = true;
 
                 }
+                if (! registered )
+                {
                 // Find machines
                 result = comp.findBehavioursOfType("ComponentSignal");
                 if (result.Length > 0)
                 {
-                    Machines.Add(new VCMachine(IceApp, comp));
-
-
+                    Components.Add(new VCComponent(IceApp, comp, true));
+                    registered = true;
+                }
                 }
             }
 

@@ -46,7 +46,7 @@ namespace vc2ice
                 RobotListBox.Items.Add(rob.getName());
 
             }
-            foreach (VCMachine holon in m_vcapp.Machines)
+            foreach (VCComponent holon in m_vcapp.Components)
             {
                 MachineListBox.Items.Add(holon.Name);
             }
