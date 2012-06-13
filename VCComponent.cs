@@ -71,8 +71,27 @@ namespace vc2ice
             //everything comes as sting from ICe so we must convert it to correct type
             IvcPropertyList2 plist = (IvcPropertyList2) Component;
             IvcProperty prop = plist.getPropertyObject(name);
-            Type tp = prop.GetType();
-            Component.setProperty(name, Convert.ChangeType(val, tp));
-        }
+            //Type tp = prop.GetType();
+           
+            //       log("SETPROP: " + prop.getProperty("Type"));
+            //log("SETPROP: " + tp + prop + tp.ToString() + tp.MakeGenericType() ) ;
+            //prop.Value =  Convert.ChangeType(val, (Type) prop.getProperty("Type")  );
+            string stype = prop.getProperty("Type");
+            switch (stype) {
+                case "Real":
+                    prop.Value = Convert.ToDouble(val);
+                    break;
+                case "Integer":
+                    prop.Value = Convert.ToInt64(val);
+                    break;
+                case "String":
+                    prop.Value = val;
+                    break;
+                default:
+                    log("Uknown format for property: " + name + " and value: " + val + " of type: " + stype);
+                    break;
+            }
+
+       }
     }
 }

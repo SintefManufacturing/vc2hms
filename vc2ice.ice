@@ -5,22 +5,23 @@
 
 module hms {
 
-	interface Simulation extends Holon { //interface to the entire Visual Component simulation
+	interface PropertyList {
+		string getProperty(string name);
+		StringSeq getPropertyList();
+		void setProperty(string name, string val);
+	} ;
+
+	interface Simulation extends Holon, PropertyList { //interface to the entire Visual Component simulation
         void start();
         void stop();
         void reset();
     };
 
-	interface VCComponent extends Holon {
-		string getProperty(string name);
-		StringSeq getPropertyList();
-		void setProperty(string name, string val);
+	interface VCComponent extends Holon, PropertyList {
+
 	};
 
-	interface Robot extends GenericRobot {
-		string getProperty(string name);
-		StringSeq getPropertyList();
-		void setProperty(string name, string val);
+	interface Robot extends GenericRobot, PropertyList {
         
     };
 

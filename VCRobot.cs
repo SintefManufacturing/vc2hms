@@ -340,7 +340,7 @@ namespace vc2ice
                     }
                 }
             }
-            App.render();
+            //App.render();
             Executor.freeze();
 
         }
