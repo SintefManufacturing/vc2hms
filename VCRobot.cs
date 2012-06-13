@@ -208,7 +208,7 @@ namespace vc2ice
             log("nf ports; "+ DigitalInput.PortCount);
             name = ((IvcPropertyList)Executor).getProperty("DigitalMapOut");
             log("mapout is: " + name);
-            DigitalOutput = (IvcSignalMap)Component.findBehaviour("Outputs");
+            DigitalOutput = (IvcSignalMap)Component.findBehaviour(name);
             log("nf ports output; " + DigitalOutput.PortCount);
         }
 

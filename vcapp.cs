@@ -18,7 +18,8 @@ namespace vc2ice
     {
         private VCApp vcApp;
 
-        public VCAppHolon(VCApp vcapp, icehms.IceApp iceapp)  :  base(iceapp, (string)vcapp.Application.getProperty("ApplicationName") , false)
+        //public VCAppHolon(VCApp vcapp, icehms.IceApp iceapp)  :  base(iceapp, (string)vcapp.Application.getProperty("ApplicationName") , false)
+        public VCAppHolon(VCApp vcapp, icehms.IceApp iceapp)  :  base(iceapp, "Simulation" , false)
         {
             //we called base with activate=false so we need to create our own "tie servant"
             register((Ice.Object)new hms.SimulationTie_(this));
@@ -50,6 +51,7 @@ namespace vc2ice
         public List<VCComponent> Components;
         private List<VCClient> m_clients;
         private icehms.IceApp IceApp;
+        private VCAppHolon Holon;
 
 
         public VCApp(icehms.IceApp app)  
@@ -59,6 +61,7 @@ namespace vc2ice
             Components = new List<VCComponent>();
             m_clients = new List<VCClient>();
             Application = (IvcApplication)new vc3DCreate.vcc3DCreate();
+            Holon = new VCAppHolon(this, app);
 
             IvcClient client = (IvcClient)this;
             Application.addClient(ref client);  
@@ -69,20 +72,21 @@ namespace vc2ice
             m_clients.Add(client);
         }
 
-        public void cleanup()
-        {
-            Robots.Clear();
+
+
+        public void shutdown()
+        {        
             foreach (VCComponent holon in Components)
             {
                 holon.shutdown();
             }
-            Components.Clear();
+            Holon.shutdown();
         }
 
         public void updateDevicesList()
         {
-
-            cleanup();
+            Components.Clear();
+            Robots.Clear();
 
             for (int i = 0; i < Application.ComponentCount; i++)
             {

@@ -23,11 +23,19 @@ namespace vc2ice
                 vcapp = new VCApp(iceapp);
                 Application.Run(new Form1(iceapp, vcapp));
             }
+            catch
+            {
+                if (iceapp != null)
+                {
+                    vcapp.shutdown();
+                    iceapp.shutdown();
+                }
+            }
             finally
             {
                 if (iceapp != null)
                 {
-                    vcapp.cleanup();
+                    vcapp.shutdown();
                     iceapp.shutdown();
                 }
             }

@@ -5,7 +5,7 @@
 
 module hms {
 
-	interface Simulation { //interface to the entire Visual Component simulation
+	interface Simulation extends Holon { //interface to the entire Visual Component simulation
         void start();
         void stop();
         void reset();
