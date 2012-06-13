@@ -173,7 +173,7 @@ namespace vc2ice
         private IvcSignalMap DigitalOutput;
 
 
-        public VCRobot(IvcApplication vc, icehms.IceApp app, IvcComponent robot)  : base (app, robot)
+        public VCRobot(IvcApplication vc, icehms.IceApp app, IvcComponent robot)  : base (app, robot, false)
         {
 
             //we called base with activate=false so we need to create our own "tie servant"

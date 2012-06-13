@@ -72,21 +72,29 @@ namespace vc2ice
             m_clients.Add(client);
         }
 
-
-
-        public void shutdown()
-        {        
+        private void reset()
+        {
             foreach (VCComponent holon in Components)
             {
                 holon.shutdown();
             }
+            foreach (VCRobot holon in Robots)
+            {
+                holon.shutdown();
+            }
+            Components.Clear();
+            Robots.Clear();
+        }
+
+        public void shutdown()
+        {        
+
             Holon.shutdown();
         }
 
         public void updateDevicesList()
         {
-            Components.Clear();
-            Robots.Clear();
+
 
             for (int i = 0; i < Application.ComponentCount; i++)
             {
@@ -114,7 +122,7 @@ namespace vc2ice
                 result = comp.findBehavioursOfType("ComponentSignal");
                 if (result.Length > 0)
                 {
-                    Components.Add(new VCComponent(IceApp, comp, true));
+                    Components.Add(new VCComponent(IceApp, comp));
                     registered = true;
                 }
                 }
