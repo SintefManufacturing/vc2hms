@@ -70,16 +70,13 @@ namespace vc2ice
 
     public class VCBehaviour : VCObject, hms.BehaviourOperations_
     {
-        public IvcComponent Component;
+        public IvcBehaviour Behaviour;
 
-        public VCBehaviour(icehms.IceApp app, IvcComponent comp)
-            : base(app, (IvcPropertyList2) comp, (string)comp.getProperty("Name"))
+        public VCBehaviour(icehms.IceApp app, IvcBehaviour beha)
+            : base(app, (IvcPropertyList2) beha, (string)beha.getProperty("Name"))
         {
-            Component = comp;
-
+            Behaviour = beha;
             register((Ice.Object)new hms.BehaviourTie_(this));
-
-
         }
 
 
@@ -130,6 +127,24 @@ namespace vc2ice
         }
 
 
+
+        public string[] getBehaviourList(Ice.Current current__)
+        {
+            string[] result = new string[Component.RootNode.BehaviourCount];
+            for (int i = 0; i < Component.RootNode.BehaviourCount; i++)
+            {
+                IvcBehaviour b = Component.RootNode.getBehaviour(i);
+                result[i] = b.getProperty("Name");
+            }
+            return result;
+           
+        }
+
+        public hms.Behaviour getBehaviour(string name, Ice.Current current__)
+        {
+            VCBehaviour tmp = new VCBehaviour( IceApp,  Component.findBehaviour(name) ) ;
+            return (hms.Behaviour) tmp.Proxy;
+        }
     }
    
 }

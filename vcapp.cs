@@ -16,29 +16,30 @@ namespace vc2ice
 
     public class VCAppHolon : VCObject, hms.SimulationOperations_
     {
-        private VCApp vcApp;
+        public IvcApplication Application;
 
         //public VCAppHolon(VCApp vcapp, icehms.IceApp iceapp)  :  base(iceapp, (string)vcapp.Application.getProperty("ApplicationName") , false)
-        public VCAppHolon(VCApp vcapp, icehms.IceApp iceapp)  :  base(iceapp, (IvcPropertyList2 ) vcapp,  "Simulation" )
+        public VCAppHolon(IvcApplication vcapp, icehms.IceApp iceapp)
+            : base(iceapp, (IvcPropertyList2) vcapp, "Simulation")
         {
             //we called base with activate=false so we need to create our own "tie servant"
             register((Ice.Object)new hms.SimulationTie_(this));
-            vcApp = vcapp;
+            Application = vcapp;
         }
 
         public void start(Ice.Current current__)
         {
-            vcApp.Application.setProperty("SimulationRunning", true);
+            Application.setProperty("SimulationRunning", true);
         }
 
         public void stop(Ice.Current current__)
         {
-            vcApp.Application.setProperty("SimulationRunning", false);
+             Application.setProperty("SimulationRunning", false);
         }
 
         public void reset(Ice.Current current__)
         {
-            IvcCommand l_restart = vcApp.Application.getCommand("resetSimulation");
+            IvcCommand l_restart = Application.getCommand("resetSimulation");
             l_restart.start();
         }
 
@@ -61,7 +62,7 @@ namespace vc2ice
             Components = new List<VCComponent>();
             m_clients = new List<VCClient>();
             Application = (IvcApplication)new vc3DCreate.vcc3DCreate();
-            Holon = new VCAppHolon(this, app);
+            Holon = new VCAppHolon(Application, app);
 
             IvcClient client = (IvcClient)this;
             Application.addClient(ref client);  

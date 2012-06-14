@@ -21,6 +21,8 @@ module hms {
     };
 
 	interface Component extends Holon, PropertyList {
+		StringSeq getBehaviourList();
+		Behaviour getBehaviour(string name);
 
 	};
 
