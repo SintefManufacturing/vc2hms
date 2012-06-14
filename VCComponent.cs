@@ -7,19 +7,99 @@ using vcCOM;
 
 namespace vc2ice
 {
-    public class VCComponent : icehms.Holon, hms.VCComponentOperations_
+
+    public class VCObject : icehms.Holon
+    {
+        public IvcPropertyList2 PList;
+
+
+        public VCObject(icehms.IceApp app, IvcPropertyList2 plist, string name)
+            : base(app, name, false)
+        {
+             PList = plist;
+        }
+
+    
+        public string getProperty(string name, Ice.Current current__)
+        {
+            return Convert.ToString(PList.getProperty(name));
+        }
+
+        public string[] getPropertyList(Ice.Current current__)
+        {
+            string[] list = new string[PList.PropertyCount];
+            for (int i = 0; i < PList.PropertyCount; i++)
+            {
+                list[i] = PList.getPropertyName(i);
+            }
+            return list;
+        }
+
+        public void setProperty(string name, string val, Ice.Current current__)
+        {
+            //everything comes as sting from ICe so we must convert it to correct type
+            IvcProperty prop = PList.getPropertyObject(name);
+            //Type tp = prop.GetType();
+           
+            //       log("SETPROP: " + prop.getProperty("Type"));
+            //log("SETPROP: " + tp + prop + tp.ToString() + tp.MakeGenericType() ) ;
+            //prop.Value =  Convert.ChangeType(val, (Type) prop.getProperty("Type")  );
+            string stype = prop.getProperty("Type");
+            switch (stype) {
+                case "Real":
+                    prop.Value = Convert.ToDouble(val);
+                    break;
+                case "Integer":
+                    prop.Value = Convert.ToInt64(val);
+                    break;
+                case "String":
+                    prop.Value = val;
+                    break;
+                default:
+                    log("Uknown format for property: " + name + " and value: " + val + " of type: " + stype);
+                    break;
+            }
+
+       }
+
+
+
+
+    }
+
+
+    public class VCBehaviour : VCObject, hms.BehaviourOperations_
+    {
+        public IvcComponent Component;
+
+        public VCBehaviour(icehms.IceApp app, IvcComponent comp)
+            : base(app, (IvcPropertyList2) comp, (string)comp.getProperty("Name"))
+        {
+            Component = comp;
+
+            register((Ice.Object)new hms.BehaviourTie_(this));
+
+
+        }
+
+
+    }
+
+
+
+    public class VCComponent : VCObject, hms.ComponentOperations_
     {
         public IvcComponent Component;
         public List<Listener> Signals;
 
 
-        public VCComponent(icehms.IceApp app, IvcComponent comp, bool activate=true) : base(app, (string)comp.getProperty("Name"), false)
+        public VCComponent(icehms.IceApp app, IvcComponent comp, bool activate=true) : base(app, (IvcPropertyList2) comp, (string)comp.getProperty("Name"))
         {
             Component = comp;
             //Name = (string)comp.getProperty("Name"); //done in base class
             if (activate)
             {
-                register((Ice.Object)new hms.VCComponentTie_(this));
+                register((Ice.Object)new hms.ComponentTie_(this));
             }
             Signals = new List<Listener>();
             registerSignals();
@@ -50,48 +130,6 @@ namespace vc2ice
         }
 
 
-
-        public string getProperty(string name, Ice.Current current__)
-        {
-            return Convert.ToString(Component.getProperty(name));
-        }
-
-        public string[] getPropertyList(Ice.Current current__)
-        {
-            string[] list = new string[Component.PropertyCount];
-            for (int i=0; i<Component.PropertyCount;i++)
-            {
-                list[i] = Component.getPropertyName(i);
-            }
-            return list;
-        }
-
-        public void setProperty(string name, string val, Ice.Current current__)
-        {
-            //everything comes as sting from ICe so we must convert it to correct type
-            IvcPropertyList2 plist = (IvcPropertyList2) Component;
-            IvcProperty prop = plist.getPropertyObject(name);
-            //Type tp = prop.GetType();
-           
-            //       log("SETPROP: " + prop.getProperty("Type"));
-            //log("SETPROP: " + tp + prop + tp.ToString() + tp.MakeGenericType() ) ;
-            //prop.Value =  Convert.ChangeType(val, (Type) prop.getProperty("Type")  );
-            string stype = prop.getProperty("Type");
-            switch (stype) {
-                case "Real":
-                    prop.Value = Convert.ToDouble(val);
-                    break;
-                case "Integer":
-                    prop.Value = Convert.ToInt64(val);
-                    break;
-                case "String":
-                    prop.Value = val;
-                    break;
-                default:
-                    log("Uknown format for property: " + name + " and value: " + val + " of type: " + stype);
-                    break;
-            }
-
-       }
     }
+   
 }

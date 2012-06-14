@@ -14,12 +14,12 @@ namespace vc2ice
 
     }
 
-    public class VCAppHolon : icehms.Holon, hms.SimulationOperations_
+    public class VCAppHolon : VCObject, hms.SimulationOperations_
     {
         private VCApp vcApp;
 
         //public VCAppHolon(VCApp vcapp, icehms.IceApp iceapp)  :  base(iceapp, (string)vcapp.Application.getProperty("ApplicationName") , false)
-        public VCAppHolon(VCApp vcapp, icehms.IceApp iceapp)  :  base(iceapp, "Simulation" , false)
+        public VCAppHolon(VCApp vcapp, icehms.IceApp iceapp)  :  base(iceapp, (IvcPropertyList2 ) vcapp,  "Simulation" )
         {
             //we called base with activate=false so we need to create our own "tie servant"
             register((Ice.Object)new hms.SimulationTie_(this));
@@ -40,50 +40,6 @@ namespace vc2ice
         {
             IvcCommand l_restart = vcApp.Application.getCommand("resetSimulation");
             l_restart.start();
-        }
-
-        public string getProperty(string name, Ice.Current current__)
-        {
-            return Convert.ToString(vcApp.Application.getProperty(name));
-        }
-
-        public string[] getPropertyList(Ice.Current current__)
-        {
-            string[] list = new string[vcApp.Application.PropertyCount];
-            for (int i = 0; i < vcApp.Application.PropertyCount; i++)
-            {
-                list[i] = vcApp.Application.getPropertyName(i);
-            }
-            return list;
-        }
-
-        public void setProperty(string name, string val, Ice.Current current__)
-        {
-            //everything comes as sting from ICe so we must convert it to correct type
-            IvcPropertyList2 plist = (IvcPropertyList2)vcApp.Application;
-            IvcProperty prop = plist.getPropertyObject(name);
-            //Type tp = prop.GetType();
-
-            //       log("SETPROP: " + prop.getProperty("Type"));
-            //log("SETPROP: " + tp + prop + tp.ToString() + tp.MakeGenericType() ) ;
-            //prop.Value =  Convert.ChangeType(val, (Type) prop.getProperty("Type")  );
-            string stype = prop.getProperty("Type");
-            switch (stype)
-            {
-                case "Real":
-                    prop.Value = Convert.ToDouble(val);
-                    break;
-                case "Integer":
-                    prop.Value = Convert.ToInt64(val);
-                    break;
-                case "String":
-                    prop.Value = val;
-                    break;
-                default:
-                    log("Uknown format for property: " + name + " and value: " + val + " of type: " + stype);
-                    break;
-            }
-
         }
 
     }
