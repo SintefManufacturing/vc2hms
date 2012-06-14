@@ -138,12 +138,12 @@ namespace vc2ice
            
         }
 
-        public hms.Behaviour getBehaviour(string name, Ice.Current current__)
+        public hms.BehaviourPrx getBehaviour(string name, Ice.Current current__)
         {
             VCBehaviour tmp = new VCBehaviour( IceApp,  Component.findBehaviour(name) ) ;
             Console.WriteLine(tmp);
             //return (hms.Behaviour) tmp;
-            return (hms.Behaviour) tmp.Servant;
+            return (hms.BehaviourPrx) tmp.Servant;
         }
     }
    
