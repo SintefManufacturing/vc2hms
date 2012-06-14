@@ -143,7 +143,7 @@ namespace vc2ice
             VCBehaviour tmp = new VCBehaviour( IceApp,  Component.findBehaviour(name) ) ;
             Console.WriteLine(tmp);
             //return (hms.Behaviour) tmp;
-            return (hms.BehaviourPrx) tmp.Servant;
+            return  (hms.BehaviourPrx) tmp.Proxy;
         }
     }
    

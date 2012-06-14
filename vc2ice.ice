@@ -22,7 +22,7 @@ module hms {
 
 	interface Component extends Holon, PropertyList {
 		StringSeq getBehaviourList();
-		Object* getBehaviour(string name);
+		Behaviour* getBehaviour(string name);
 
 	};
 
