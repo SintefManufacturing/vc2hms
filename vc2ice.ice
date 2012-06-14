@@ -26,7 +26,7 @@ module hms {
 
 	};
 
-	interface Robot extends GenericRobot, PropertyList {
+	interface Robot extends GenericRobot, Component {
         
     };
 
