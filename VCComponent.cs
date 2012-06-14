@@ -76,10 +76,8 @@ namespace vc2ice
             : base(app, (IvcPropertyList2) beha, (string)beha.getProperty("Name"))
         {
             Behaviour = beha;
-            register((Ice.Object)new hms.BehaviourTie_(this));
+            register((Ice.Object)new hms.BehaviourTie_(this), false);
         }
-
-
     }
 
 
@@ -143,7 +141,9 @@ namespace vc2ice
         public hms.Behaviour getBehaviour(string name, Ice.Current current__)
         {
             VCBehaviour tmp = new VCBehaviour( IceApp,  Component.findBehaviour(name) ) ;
-            return (hms.Behaviour) tmp.Proxy;
+            Console.WriteLine(tmp);
+            //return (hms.Behaviour) tmp;
+            return (hms.Behaviour) tmp.Servant;
         }
     }
    
