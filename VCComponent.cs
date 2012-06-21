@@ -88,13 +88,13 @@ namespace vc2ice
         public List<Listener> Signals;
 
 
-        public VCComponent(icehms.IceApp app, IvcComponent comp, bool activate=true) : base(app, (IvcPropertyList2) comp, (string)comp.getProperty("Name"))
+        public VCComponent(icehms.IceApp app, IvcComponent comp, bool activate=true, bool icegrid=true) : base(app, (IvcPropertyList2) comp, (string)comp.getProperty("Name"))
         {
             Component = comp;
             //Name = (string)comp.getProperty("Name"); //done in base class
             if (activate)
             {
-                register((Ice.Object)new hms.ComponentTie_(this));
+                register((Ice.Object)new hms.ComponentTie_(this), icegrid);
             }
             Signals = new List<Listener>();
             registerSignals();

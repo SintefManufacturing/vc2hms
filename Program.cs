@@ -23,10 +23,10 @@ namespace vc2ice
                 vcapp = new VCApp(iceapp);
                 Application.Run(new Form1(iceapp, vcapp));
             }
-            catch (Exception ex )
-            {
-                Console.WriteLine(ex);
-            }
+//            catch (Exception ex )
+//            {
+//                Console.WriteLine(ex);
+//            }
             finally
             {
                 if (vcapp != null)

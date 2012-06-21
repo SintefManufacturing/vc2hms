@@ -5,6 +5,8 @@
 
 module hms {
 
+
+
 	interface PropertyList {
 		string getProperty(string name);
 		StringSeq getPropertyList();
@@ -24,6 +26,11 @@ module hms {
 		StringSeq getBehaviourList();
 		Behaviour* getBehaviour(string name);
 
+	};
+
+	interface Signal extends GenericEventInterface {
+		void newBooleanSignal(string name, bool val);
+		void newComponentSignal(string Name, Component* comp);
 	};
 
 	interface Robot extends GenericRobot, Component {

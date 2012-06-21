@@ -202,14 +202,14 @@ namespace vc2ice
             result = Component.findBehavioursOfType("RslExecutor");
             Executor = (IvcExecutor) result[0];  
             Executor.addExecutorClient(this);
+             IvcRslExecutor rslex =  (IvcRslExecutor) Executor;
             ((IvcPropertyList)Executor).setProperty("ExecutionMode", true);  //we are ready
             string name = ((IvcPropertyList)Executor).getProperty("DigitalMapIn");
             DigitalInput = (IvcSignalMap) Component.findBehaviour(name);
-            log("nf ports; "+ DigitalInput.PortCount);
             name = ((IvcPropertyList)Executor).getProperty("DigitalMapOut");
-            log("mapout is: " + name);
             DigitalOutput = (IvcSignalMap)Component.findBehaviour(name);
-            log("nf ports output; " + DigitalOutput.PortCount);
+            log("nb ports output; " + DigitalOutput.getProperty("PortCount"));
+            //DigitalOutput.getPortSignal(2);
         }
 
 
@@ -301,7 +301,7 @@ namespace vc2ice
 
         public void notifyBinaryInputValueChange(int Index, bool Value)
         {
-
+            log("Binary input: " + Index + " has been changed to: " + Value);
         }
 
         public void notifyIntegerInputValueChange(int Index, int Value)
@@ -392,8 +392,9 @@ namespace vc2ice
 
         public void setDigitalOut(int nb, bool val, Ice.Current current__=null)
         {
-            IvcSignal sig =   DigitalOutput.getPortSignal(nb);
-            sig.setProperty("Value", val);
+            Executor.setBinaryOutput(0, nb, val);
+            //IvcSignal sig =   DigitalOutput.getPortSignal(nb);
+            //sig.setProperty("Value", val);
         }
 
         public void setAnalogOut(int nb, bool val, Ice.Current current__=null)

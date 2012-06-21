@@ -8,14 +8,16 @@ namespace vc2ice
         IvcPropertyList2 m_Signal;
         String m_ComponentName;
         String m_Type;
-        hms.GenericEventInterfacePrx m_pub;
+        hms.SignalPrx m_pub;
+        icehms.IceApp IceApp;
 
 
         public Listener(string componentName, IvcPropertyList2 signal, icehms.IceApp iceapp)
         {
+            IceApp = iceapp;
             m_ComponentName = componentName;
             m_Signal = signal;
-            m_pub = iceapp.getEventPublisher(getID());
+            m_pub = hms.SignalPrxHelper.uncheckedCast( iceapp.getEventPublisher(getID()) );
             IvcEventProperty l_EProp = (IvcEventProperty)signal.getPropertyObject("Value");
             IvcEventPropertyListener l_Listener = this;
             l_EProp.addListener(ref l_Listener);
@@ -56,9 +58,13 @@ namespace vc2ice
                           IvcComponent comp = (IvcComponent)Property.ExtendedValue;
                           Console.WriteLine(getID() + " Extended type: " + comp.GetType());
                           //Console.WriteLine( comp.getProperty("Container::Location"));
-                          Console.WriteLine(comp.RootNode);
+
                           if (comp.RootNode != null)
                           {
+                              //first resend signal to Ice
+                              VCComponent mycomp = new VCComponent(IceApp, Property.ExtendedValue, true, false);
+                              m_pub.newComponentSignal(m_Signal.getProperty("Name"), hms.ComponentPrxHelper.uncheckedCast(mycomp.Proxy));
+                              //Now send a message
                               Helpers.printMatrix("comp pose: ", comp.RootNode.getProperty("WorldPositionMatrix"));
                               hms.Message msg = new hms.Message();
                               msg.arguments = new System.Collections.Generic.Dictionary<string, string>();
@@ -78,6 +84,10 @@ namespace vc2ice
               }
               else
               {
+                  //first resend signal to Ice
+                  m_pub.newBooleanSignal(m_Signal.getProperty("Name"), Property.ExtendedValue);
+                  //Now send a message
+
                   Console.WriteLine( getID() + " got Boolean Signal " + (string)m_Signal.getProperty("Name") + "  " + Value.ToString());
                   hms.Message msg = new hms.Message();
                   msg.arguments = new System.Collections.Generic.Dictionary<string, string>();
