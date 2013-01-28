@@ -214,7 +214,10 @@ namespace vc2ice
         }
 
 
-
+        public void setCSYS(hms.CSYS csys, Ice.Current current = null)
+        {
+            defaultCSYS = csys;
+        }
         public List<string> getJoints()
         {
             List<string> list = new List<string>();
@@ -256,15 +259,16 @@ namespace vc2ice
 
         }
 
-        public void movej(double[] pose, double acc = 2, double speed=1, Ice.Current icecurrent=null)
+        public void movej(double[] pose, double acc = 2, double speed=0.1, Ice.Current icecurrent=null)
         {
-            for( int i; i=0; i < pose.Length{
+            for (int i=0; i < pose.Length; i++ )
+            {
                 pose[i] = pose[i] * 180 / 3.14159;
             }
             log("New joint move command: ");
             lock (this)
             {
-                CurrentMove = new Move(App, MoveType.Joint, Controller, pose, speed, acc);
+                CurrentMove = new Move(App, MoveType.Joint, Controller, pose, speed * 180 / 3.141, acc * 180 / 3.141);
             }
         }
 
@@ -278,10 +282,19 @@ namespace vc2ice
             switch (defaultCSYS)
             {
                 case hms.CSYS.Base:
-                    return target.RobotRootToRobotFlangeMatrix;
+                     matrix = target.RobotRootToRobotFlangeMatrix.Copy();
+                     for (int i = 0; i < matrix.Length; i++)
+                     {
+                         matrix[i] = matrix[i] / 1000;
+                     }
+                    return matrix;
                 case hms.CSYS.World:
                     matrix = Helpers.AddMatrix(target.WorldToRootNodeMatrix, target.RootNodeToRobotRootMatrix );
                     matrix = Helpers.AddMatrix(matrix, target.RobotRootToRobotFlangeMatrix );
+                    for (int i = 0; i < matrix.Length; i++)
+                    {
+                        matrix[i] = matrix[i] / 1000;
+                    }
                     return matrix;
                 default:
                     goto case hms.CSYS.World;       
@@ -295,9 +308,13 @@ namespace vc2ice
         public void movel(double[] pose, double acc = 2, double speed = 1, Ice.Current icecurrent=null)
         {
             log("New move command: ");
+            for (int i = 0; i < pose.Length; i++)
+            {
+                pose[i] = pose[i] * 1000;
+            }
             lock (this)
             {
-                CurrentMove = new Move(App, MoveType.Linear, Controller, pose, speed, acc, defaultCSYS);
+                CurrentMove = new Move(App, MoveType.Linear, Controller, pose, speed*1000, acc*1000, defaultCSYS);
             }
         }
 
