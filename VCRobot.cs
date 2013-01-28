@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Collections.Generic;
 using vcCOM;
 using vcCOMExecutor;
@@ -259,7 +260,7 @@ namespace vc2ice
 
         }
 
-        public void movej(double[] pose, double acc = 2, double speed=0.1, Ice.Current icecurrent=null)
+        public void movej(double[] pose, double acc = 0.1, double speed=0.05, Ice.Current icecurrent=null)
         {
             for (int i=0; i < pose.Length; i++ )
             {
@@ -268,7 +269,10 @@ namespace vc2ice
             log("New joint move command: ");
             lock (this)
             {
-                CurrentMove = new Move(App, MoveType.Joint, Controller, pose, speed * 180 / 3.141, acc * 180 / 3.141);
+                CurrentMove = new Move(App, MoveType.Joint, Controller, pose, speed*180/3.141, acc*180/3.141);
+            }
+            while ( isProgrammingRunning() == true ){
+                Thread.Sleep(50);
             }
         }
 
@@ -305,7 +309,7 @@ namespace vc2ice
             defaultCSYS = cref;
         }
 
-        public void movel(double[] pose, double acc = 2, double speed = 1, Ice.Current icecurrent=null)
+        public void movel(double[] pose, double acc = 0.01, double speed = 0.01, Ice.Current icecurrent=null)
         {
             log("New move command: ");
             for (int i = 0; i < pose.Length; i++)
@@ -315,6 +319,9 @@ namespace vc2ice
             lock (this)
             {
                 CurrentMove = new Move(App, MoveType.Linear, Controller, pose, speed*1000, acc*1000, defaultCSYS);
+            }
+            while ( isProgrammingRunning() == true ){
+                Thread.Sleep(50);
             }
         }
 
