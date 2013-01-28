@@ -37,7 +37,7 @@ namespace vc2ice
 
         public void setProperty(string name, string val, Ice.Current current__)
         {
-            //everything comes as sting from ICe so we must convert it to correct type
+            //everything comes as string from Ice so we must convert it to correct type
             IvcProperty prop = PList.getPropertyObject(name);
             //Type tp = prop.GetType();
            
@@ -88,10 +88,12 @@ namespace vc2ice
         public List<Listener> Signals;
 
 
-        public VCComponent(icehms.IceApp app, IvcComponent comp, bool activate=true, bool icegrid=true) : base(app, (IvcPropertyList2) comp, (string)comp.getProperty("Name"))
+        public VCComponent(icehms.IceApp app, IvcComponent comp, bool activate = true, bool icegrid = true)
+            : base(app, (IvcPropertyList2)comp, (string)comp.getProperty("Name"))
         {
             Component = comp;
             //Name = (string)comp.getProperty("Name"); //done in base class
+
             if (activate)
             {
                 register((Ice.Object)new hms.ComponentTie_(this), icegrid);
