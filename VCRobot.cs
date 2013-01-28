@@ -171,6 +171,7 @@ namespace vc2ice
         private Move CurrentMove;
         private IvcSignalMap DigitalInput;
         private IvcSignalMap DigitalOutput;
+        private hms.CSYS defaultCSYS = hms.CSYS.World;
 
 
         public VCRobot(IvcApplication vc, icehms.IceApp app, IvcComponent robot)  : base (app, robot, false)
@@ -229,7 +230,7 @@ namespace vc2ice
             List<double> list = new List<double>();
             foreach (IvcEventProperty j in Joints)
             {
-                list.Add(j.Value);
+                list.Add(j.Value * 3.14159 / 180);
             }         
             return list.ToArray();
         }
@@ -255,8 +256,11 @@ namespace vc2ice
 
         }
 
-        public void movej(double[] pose, double speed = 2, double acc=1, Ice.Current icecurrent=null)
+        public void movej(double[] pose, double acc = 2, double speed=1, Ice.Current icecurrent=null)
         {
+            for( int i; i=0; i < pose.Length{
+                pose[i] = pose[i] * 180 / 3.14159;
+            }
             log("New joint move command: ");
             lock (this)
             {
@@ -266,12 +270,12 @@ namespace vc2ice
 
 
 
-        public double[] getl(hms.CSYS cref, Ice.Current current = null)
+        public double[] getl(Ice.Current current=null)
         {
             IvcMotionInterpolator motion = Controller.createMotionInterpolator();
             IvcMotionTarget target = Controller.createTarget();
             double[] matrix;
-            switch (cref)
+            switch (defaultCSYS)
             {
                 case hms.CSYS.Base:
                     return target.RobotRootToRobotFlangeMatrix;
@@ -284,16 +288,16 @@ namespace vc2ice
             }
         }
 
+        public void setCSYS(hms.CSYS cref){
+            defaultCSYS = cref;
+        }
 
-
-
-
-        public void movel(double[] pose, double speed = 2, double acc = 1, hms.CSYS cref=hms.CSYS.World, Ice.Current icecurrent = null)
+        public void movel(double[] pose, double acc = 2, double speed = 1, Ice.Current icecurrent=null)
         {
             log("New move command: ");
             lock (this)
             {
-                CurrentMove = new Move(App, MoveType.Linear, Controller, pose, speed, acc, cref);
+                CurrentMove = new Move(App, MoveType.Linear, Controller, pose, speed, acc, defaultCSYS);
             }
         }
 
