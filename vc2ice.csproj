@@ -64,16 +64,16 @@
     <Compile Include="Helpers.cs" />
     <Compile Include="Listener.cs" />
     <Compile Include="VCRobot.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="Window.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="Window.Designer.cs">
+      <DependentUpon>Window.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="Window.resx">
+      <DependentUpon>Window.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -152,7 +152,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties ZerocIce_VerboseLevel="2" ZerocIce_Enabled="True" ZerocIce_OutputDir="." ZerocIce_Prefix="True" ZerocIce_IncludePath="C:\Users\olrd\Documents\icehms\slices|C:\Users\olrd\Documents\Visual Studio 2010\Projects\vc2ice\vc2ice" ZerocIce_Tie="True" />
+      <UserProperties ZerocIce_Tie="True" ZerocIce_IncludePath="C:\Users\olrd\Documents\icehms\slices|C:\Users\olrd\Documents\Visual Studio 2010\Projects\vc2ice\vc2ice" ZerocIce_Prefix="True" ZerocIce_OutputDir="." ZerocIce_Enabled="True" ZerocIce_VerboseLevel="2" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

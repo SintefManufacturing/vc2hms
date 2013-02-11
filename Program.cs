@@ -20,13 +20,14 @@ namespace vc2ice
             try
             {
                 iceapp = new IceApp("VC2IceAdapter", "utgaard.sintef.no", 12000, false);
+                //iceapp = new IceApp("VC2IceAdapter", "192.168.1.15", 12000, false);
                 vcapp = new VCApp(iceapp);
-                Application.Run(new Form1(iceapp, vcapp));
+                Application.Run(new Window(iceapp, vcapp));
             }
-//            catch (Exception ex )
-//            {
-//                Console.WriteLine(ex);
-//            }
+            catch (Exception ex )
+            {
+                Console.WriteLine(ex);
+            }
             finally
             {
                 if (vcapp != null)

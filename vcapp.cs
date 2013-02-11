@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using vcCOM;
 
 namespace vc2ice
@@ -45,7 +43,7 @@ namespace vc2ice
 
     }
 
-    public class VCApp: IvcClient  
+    public class VCApp: IvcClient2  
     {
         public IvcApplication Application;
         public List<VCRobot> Robots;
@@ -119,7 +117,7 @@ namespace vc2ice
                 }
                 if (! registered )
                 {
-                // Find machines
+                // create the rest as vccomponents
                 result = comp.findBehavioursOfType("ComponentSignal");
                 if (result.Length > 0)
                 {
@@ -178,7 +176,7 @@ namespace vc2ice
 
         public void notifySimHeartbeat(double SimTime)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         public void notifySimulation(int State)
@@ -208,5 +206,38 @@ namespace vc2ice
         #endregion
 
 
+
+
+        public void notifyContainer(ref IvcApplication Application, bool Added)
+        {
+            //throw new NotImplementedException();
+        }
+
+        public void notifyDynamicComponent(ref IvcComponent Component, ref IvcBehaviour Container, bool Added)
+        {
+
+            Console.WriteLine("Dynamic component added!!!!!!!!!!!!!!!!!: " + Added);
+
+        }
+
+        public void notifyExternalDragLeave()
+        {
+            //throw new NotImplementedException();
+        }
+
+        public int queryExternalDragDrop(ref object Data, int CursorX, int CursorY, int ShiftState)
+        {
+            return 0;
+        }
+
+        public int queryExternalDragEnter(ref object Data, int CursorX, int CursorY, int ShiftState)
+        {
+            return 0;
+        }
+
+        public int queryExternalDragOver(int CursorX, int CursorY, int ShiftState)
+        {
+            return 0;
+        }
     }
 }

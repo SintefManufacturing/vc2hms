@@ -89,7 +89,7 @@ namespace vc2ice
 
 
         public VCComponent(icehms.IceApp app, IvcComponent comp, bool activate = true, bool icegrid = true)
-            : base(app, (IvcPropertyList2)comp, (string)comp.getProperty("Name"))
+            : base(app, (IvcPropertyList2)comp, (string)comp.getProperty("Name"))   //Name is not uniq, SessionID is!
         {
             Component = comp;
             //Name = (string)comp.getProperty("Name"); //done in base class

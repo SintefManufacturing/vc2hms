@@ -180,7 +180,7 @@ namespace vc2ice
 
             //we called base with activate=false so we need to create our own "tie servant"
             register((Ice.Object)new hms.RobotTie_(this));
-
+            defaultCSYS = hms.CSYS.World;
             App = vc;
             object[] result = Component.findBehavioursOfType("RobotController");
             if (result.Length == 0)
@@ -195,7 +195,9 @@ namespace vc2ice
                 Joints = new List<IvcEventProperty>();
                 for (int k = 0; k < Controller.JointCount; k++)
                 {
+                    
                     string jointname = (string)Controller.getJoint(k).getProperty("Name");
+                    log("Joint: "+ k+ " "+ jointname); 
                     IvcEventProperty joint = (IvcEventProperty)compprops.getPropertyObject(jointname);
                     Joints.Add(joint);
                 }
@@ -271,7 +273,7 @@ namespace vc2ice
             {
                 CurrentMove = new Move(App, MoveType.Joint, Controller, pose, speed*180/3.141, acc*180/3.141);
             }
-            while ( isProgrammingRunning() == true ){
+            while ( isProgramRunning() == true ){
                 Thread.Sleep(50);
             }
         }
@@ -320,7 +322,7 @@ namespace vc2ice
             {
                 CurrentMove = new Move(App, MoveType.Linear, Controller, pose, speed*1000, acc*1000, defaultCSYS);
             }
-            while ( isProgrammingRunning() == true ){
+            while ( isProgramRunning() == true ){
                 Thread.Sleep(50);
             }
         }

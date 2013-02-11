@@ -13,14 +13,14 @@ using System.Diagnostics;
 
 namespace vc2ice
 {
-    public partial class Form1 : Form, VCClient
+    public partial class Window : Form, VCClient
     {
 
         private icehms.IceApp m_iceapp;
         private VCApp m_vcapp;
         private VCRobot m_rob;
 
-        public Form1(icehms.IceApp iceapp, VCApp vcapp)
+        public Window(icehms.IceApp iceapp, VCApp vcapp)
         {
             InitializeComponent(); // MFC component, Windows stuff
 
