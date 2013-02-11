@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Windows.Forms;
+//using System.Windows.Forms;
 using icehms;
+using System.Threading;
 
 namespace vc2ice
 {
@@ -9,12 +10,12 @@ namespace vc2ice
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        [STAThread]
+        //[STAThread]
         static void Main()
         {
             
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            //Application.EnableVisualStyles();
+            //Application.SetCompatibleTextRenderingDefault(false);
             icehms.IceApp iceapp = null;
             VCApp vcapp = null;
             try
@@ -22,7 +23,12 @@ namespace vc2ice
                 iceapp = new IceApp("VC2IceAdapter", "utgaard.sintef.no", 12000, false);
                 //iceapp = new IceApp("VC2IceAdapter", "192.168.1.15", 12000, false);
                 vcapp = new VCApp(iceapp);
-                Application.Run(new Window(iceapp, vcapp));
+                //Application.Run(new Window(iceapp, vcapp));  
+                vcapp.updateDevicesList();
+                while (true)
+                {
+                    Thread.Sleep(10);
+                }
             }
             catch (Exception ex )
             {
