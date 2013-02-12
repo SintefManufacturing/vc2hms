@@ -23,6 +23,7 @@ namespace vc2ice
             //we called base with activate=false so we need to create our own "tie servant"
             register((Ice.Object)new hms.SimulationTie_(this));
             Application = vcapp;
+
         }
 
         public void start(Ice.Current current__)
@@ -64,6 +65,7 @@ namespace vc2ice
 
             IvcClient client = (IvcClient)this;
             Application.addClient(ref client);
+            createCurrentComponents();
         }
 
         public void register(VCClient client)

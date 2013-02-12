@@ -1,5 +1,4 @@
 ﻿using System;
-//using System.Windows.Forms;
 using icehms;
 using System.Threading;
 
@@ -7,15 +6,12 @@ namespace vc2ice
 {
     static class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
+
         //[STAThread]
         static void Main()
         {
-            
-            //Application.EnableVisualStyles();
-            //Application.SetCompatibleTextRenderingDefault(false);
+
+
             icehms.IceApp iceapp = null;
             VCApp vcapp = null;
             try
@@ -23,14 +19,26 @@ namespace vc2ice
                 iceapp = new IceApp("VC2IceAdapter", "utgaard.sintef.no", 12000, false);
                 //iceapp = new IceApp("VC2IceAdapter", "192.168.1.15", 12000, false);
                 vcapp = new VCApp(iceapp);
-                //Application.Run(new Window(iceapp, vcapp));  
-                vcapp.createCurrentComponents();
-                while (true)
-                {
-                    Thread.Sleep(10);
-                }
+                Console.WriteLine("Press any key to exit");
+                Console.ReadLine();
+                /*
+               while (Console.ReadKey(true).Key != ConsoleKey.Escape)
+               {
+                   Thread.Sleep(10);
+               }
+               Console.WriteLine("VC2IceHMS Finished");
+               //Console.ReadKey(true);
+               
+                
+               while (true)
+               {
+                   Thread.Sleep(10);
+               }
+                   */
+                //System("pause");
+
             }
-            catch (Exception ex )
+            catch (Exception ex)
             {
                 Console.WriteLine(ex);
             }
@@ -45,6 +53,8 @@ namespace vc2ice
                     iceapp.shutdown();
                 }
             }
+            Console.WriteLine("Press any key to close");
+            Console.ReadLine();
 
         }
     }

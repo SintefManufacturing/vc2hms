@@ -57,35 +57,54 @@ namespace vc2ice
             {
                 if (Value != null)
                 {
-                    Console.WriteLine(getID() + " got Component Signal of type: " + Value.GetType());
+                    Console.WriteLine(getID() + " got Component Signal for comp " + Value +" of type: " + Value.GetType());
 
                     if (Property.ExtendedValue != null)
                     {
                         IvcComponent comp = (IvcComponent)Property.ExtendedValue;
                         Console.WriteLine(getID() + " Extended type: " + comp.GetType());
                         //Console.WriteLine( comp.getProperty("Container::Location"));
-
-                        if (comp.RootNode != null)
+                        string[] list = new string[comp.PropertyCount];
+                        for (int i = 0; i < comp.PropertyCount; i++)
                         {
-                            //find if component exist in ice world
-                            //(m_Signal.getProperty("Name")
+                            string n = comp.getPropertyName(i);
+                            Console.WriteLine("prop: " + n  );
+                            Console.WriteLine("val: " + comp.getProperty(n));
+                        }
 
-                            /*
-                            //first resend signal to Ice
-                            CompCounter++;
-                            //VCComponent mycomp = new VCComponent(IceApp, Property.ExtendedValue, true, false);
-
-                            m_pub.newComponentSignal(m_Signal.getProperty("Name"), hms.ComponentPrxHelper.uncheckedCast(mycomp.Proxy));
-                            //Now send a message
-                            Helpers.printMatrix("comp pose: ", comp.RootNode.getProperty("WorldPositionMatrix"));
-                            hms.Message msg = new hms.Message();
-                            msg.arguments = new System.Collections.Generic.Dictionary<string, string>();
-                            msg.arguments.Add("ComponentName", m_ComponentName);
-                            msg.arguments.Add("SignalName", m_Type);
-                            msg.arguments.Add("SignalType", m_Type);
-                            msg.arguments.Add("WorldPositionMatrix", String.Join(",", comp.RootNode.getProperty("WorldPositionMatrix")));
-                            m_pub.putMessage(msg);
-                             * */
+                        if (comp.RootNode == null)
+                        {
+                            Console.WriteLine("Root node of comp is null!!!!!!!!!!!!");
+                            //string name = comp.getProperty("Name");
+                            //Console.WriteLine("name");
+                        } else
+                        {
+                            Console.WriteLine("Find if holon exist");
+                            //find if holon exist for component
+                            string name = comp.getProperty("Name");
+                            string dname = name + comp.getProperty("SessionID"); //name for dynamic components
+                            Ice.ObjectPrx prx = IceApp.getHolon(dname);
+                            if (prx == null)
+                            {
+                                Console.WriteLine("was not a dynamic comp");
+                                prx = IceApp.getHolon(name); //FIXME: we might return wonrg object if it is instanciated
+                                dname = name;
+                            }
+                            if (prx != null)
+                            {
+                                Console.WriteLine("Sending event and msg");
+                                //m_pub.newComponentSignal(m_Signal.getProperty("Name"), hms.ComponentPrxHelper.uncheckedCast(prx));
+                                //Now send a message
+                                Helpers.printMatrix("comp pose: ", comp.RootNode.getProperty("WorldPositionMatrix"));
+                                hms.Message msg = new hms.Message();
+                                msg.arguments = new System.Collections.Generic.Dictionary<string, string>();
+                                msg.arguments.Add("EmitorName", m_ComponentName);
+                                msg.arguments.Add("ComponentName",dname);
+                                msg.arguments.Add("SignalName", m_Type);
+                                msg.arguments.Add("SignalType", m_Type);
+                                msg.arguments.Add("WorldPositionMatrix", String.Join(",", comp.RootNode.getProperty("WorldPositionMatrix")));
+                                m_pub.putMessage(msg);
+                            }
                         }
 
 
@@ -98,13 +117,13 @@ namespace vc2ice
             else
             {
                 //first resend signal to Ice
-                m_pub.newBooleanSignal(m_Signal.getProperty("Name"), Property.ExtendedValue);
+                //m_pub.newBooleanSignal(m_Signal.getProperty("Name"), Property.ExtendedValue);
                 //Now send a message
 
-                Console.WriteLine(getID() + " got Boolean Signal " + (string)m_Signal.getProperty("Name") + "  " + Value.ToString());
+                Console.WriteLine(getID() + " got Boolean Signal " + (string)m_Signal.getProperty("Name") + "  " + Value.ToString() + " re-sending it to icehms");
                 hms.Message msg = new hms.Message();
                 msg.arguments = new System.Collections.Generic.Dictionary<string, string>();
-                msg.arguments.Add("ComponentName", m_ComponentName);
+                msg.arguments.Add("EmitortName", m_ComponentName);
                 msg.arguments.Add("SignalName", m_Type);
                 msg.arguments.Add("SignalType", m_Type);
                 msg.arguments.Add("SignalValue", Value.ToString());
