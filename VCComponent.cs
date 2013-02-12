@@ -103,10 +103,9 @@ namespace vc2ice
             
         }
 
-
-
         public override void shutdown()
         {
+            deregisterSignals();
             base.shutdown();
         }
 
@@ -124,6 +123,14 @@ namespace vc2ice
                 Signals.Add(listen);
             }
 
+        }
+
+        private void deregisterSignals()
+        {
+            foreach (Listener listen in Signals)
+            {
+                listen.shutdown();
+            }
         }
 
 

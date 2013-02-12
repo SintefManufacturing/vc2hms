@@ -47,7 +47,6 @@ namespace vc2ice
     public class VCApp : IvcClient2
     {
         public IvcApplication Application;
-        public List<VCRobot> Robots;
         public List<VCComponent> Components;
         private List<VCClient> m_clients;
         private icehms.IceApp IceApp;
@@ -57,7 +56,6 @@ namespace vc2ice
         public VCApp(icehms.IceApp app)
         {
             IceApp = app;
-            Robots = new List<VCRobot>();
             Components = new List<VCComponent>();
             m_clients = new List<VCClient>();
             Application = (IvcApplication)new vc3DCreate.vcc3DCreate();
@@ -73,23 +71,14 @@ namespace vc2ice
             m_clients.Add(client);
         }
 
-        private void reset()
+
+        public void shutdown()
         {
+            Application.removeClient(this);
             foreach (VCComponent holon in Components)
             {
                 holon.shutdown();
             }
-            foreach (VCRobot holon in Robots)
-            {
-                holon.shutdown();
-            }
-            Components.Clear();
-            Robots.Clear();
-        }
-
-        public void shutdown()
-        {
-
             Holon.shutdown();
         }
 
@@ -109,13 +98,6 @@ namespace vc2ice
         private bool isCreated(string name)
         {
             foreach (VCComponent holon in Components)
-            {
-                if (holon.getName() == name)
-                {
-                    return true;
-                }
-            }
-            foreach (VCRobot holon in Robots)
             {
                 if (holon.getName() == name)
                 {
@@ -200,23 +182,17 @@ namespace vc2ice
             Console.WriteLine("Adding:    " + name);
             if (!isCreated(name))
             {
+                VCComponent mycomp;
                 if (isRobot(comp))
                 {
-                    Console.WriteLine(name + " is a robot!");
                     VCRobot rob = new VCRobot(Application, IceApp, comp, name);
-                    Robots.Add(rob);
+                    mycomp = (VCComponent)rob;
                 }
                 else
                 {
-                    Components.Add(new VCComponent(IceApp, comp, name));
-                    /*
-                    object[] result = comp.findBehavioursOfType("ComponentSignal"); //create component for objects which have components signals
-                    if (result.Length > 0)
-                    {
-                        Components.Add(new VCComponent(IceApp, comp, name));
-                    }
-                     * */
+                    mycomp = new VCComponent(IceApp, comp, name);
                 }
+                Components.Add(mycomp);
                 return true;
             }
             else { return false; }
@@ -248,16 +224,6 @@ namespace vc2ice
                 {
                     holon.shutdown();
                     Components.Remove(holon);
-                    return;
-                }
-            }
-            for (int i = 0; i < Robots.Count; i++)
-            {
-                VCRobot holon = Robots[i];
-                if (holon.getName() == name)
-                {
-                    holon.shutdown();
-                    Robots.Remove(holon);
                     return;
                 }
             }

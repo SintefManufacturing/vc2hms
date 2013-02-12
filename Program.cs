@@ -44,13 +44,19 @@ namespace vc2ice
             }
             finally
             {
-                if (vcapp != null)
+                try
                 {
-                    vcapp.shutdown();
-                }
-                if (iceapp != null)
+                    if (vcapp != null)
+                    {
+                        vcapp.shutdown();
+                    }
+                }       
+                finally
                 {
-                    iceapp.shutdown();
+                    if (iceapp != null)
+                    {
+                        iceapp.shutdown();
+                    }
                 }
             }
             Console.WriteLine("Press any key to close");

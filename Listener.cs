@@ -26,7 +26,17 @@ namespace vc2ice
 
             m_pub = hms.SignalPrxHelper.uncheckedCast(iceapp.getEventPublisher(getID()));
             IvcEventPropertyListener l_Listener = this;
-            l_EProp.addListener(ref l_Listener);
+            l_EProp.addListener(this);
+        }
+
+        public void shutdown()
+        {
+            IvcEventProperty l_EProp = (IvcEventProperty)m_Signal.getPropertyObject("Value");
+            if (l_EProp != null)
+            {
+                l_EProp.removeListener(this);
+            }
+            
         }
 
         public string getName()
