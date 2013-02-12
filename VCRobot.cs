@@ -175,9 +175,8 @@ namespace vc2ice
         private hms.CSYS defaultCSYS = hms.CSYS.World;
 
 
-        public VCRobot(IvcApplication vc, icehms.IceApp app, IvcComponent robot)  : base (app, robot, false)
+        public VCRobot(IvcApplication vc, icehms.IceApp app, IvcComponent robot, string name)  : base (app, robot, name, false)
         {
-
             //we called base with activate=false so we need to create our own "tie servant"
             register((Ice.Object)new hms.RobotTie_(this));
             defaultCSYS = hms.CSYS.World;
@@ -208,10 +207,10 @@ namespace vc2ice
             Executor.addExecutorClient(this);
              IvcRslExecutor rslex =  (IvcRslExecutor) Executor;
             ((IvcPropertyList)Executor).setProperty("ExecutionMode", true);  //we are ready
-            string name = ((IvcPropertyList)Executor).getProperty("DigitalMapIn");
-            DigitalInput = (IvcSignalMap) Component.findBehaviour(name);
-            name = ((IvcPropertyList)Executor).getProperty("DigitalMapOut");
-            DigitalOutput = (IvcSignalMap)Component.findBehaviour(name);
+            string pname = ((IvcPropertyList)Executor).getProperty("DigitalMapIn");
+            DigitalInput = (IvcSignalMap) Component.findBehaviour(pname);
+            pname = ((IvcPropertyList)Executor).getProperty("DigitalMapOut");
+            DigitalOutput = (IvcSignalMap)Component.findBehaviour(pname);
             log("nb ports output; " + DigitalOutput.getProperty("PortCount"));
             //DigitalOutput.getPortSignal(2);
         }

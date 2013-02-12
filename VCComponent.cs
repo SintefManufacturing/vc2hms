@@ -88,8 +88,8 @@ namespace vc2ice
         public List<Listener> Signals;
 
 
-        public VCComponent(icehms.IceApp app, IvcComponent comp, bool activate = true, bool icegrid = true)
-            : base(app, (IvcPropertyList2)comp, (string)comp.getProperty("Name"))   //Name is not uniq, SessionID is!
+        public VCComponent(icehms.IceApp app, IvcComponent comp, string name, bool activate = true, bool icegrid = true)
+            : base(app, (IvcPropertyList2)comp, name)  
         {
             Component = comp;
             //Name = (string)comp.getProperty("Name"); //done in base class

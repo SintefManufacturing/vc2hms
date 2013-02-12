@@ -129,10 +129,9 @@ namespace vc2ice
             for (int i = 0; i < Application.ComponentCount; i++)
             {
                 IvcComponent comp = Application.getComponent(i);
-                addComponent(comp);
+                addComponent(comp, (string)comp.getProperty("Name"));
             }
         }
-
 
 
 
@@ -188,25 +187,33 @@ namespace vc2ice
         }
 
 
-        private bool addComponent(IvcComponent comp)
+        private void createComponent(IvcComponent comp, string name)
         {
-            string cname = (string)comp.getProperty("Name");
-            Console.WriteLine("Addind:    " + cname);
-            if (!isCreated(cname))
+
+
+        }
+
+        private bool addComponent(IvcComponent comp, string name)
+        {
+            Console.WriteLine("Adding:    " + name);
+            if (!isCreated(name))
             {
                 if (isRobot(comp))
                 {
-                    Console.WriteLine(cname + " is a robot!");
-                    VCRobot rob = new VCRobot(Application, IceApp, comp);
+                    Console.WriteLine(name + " is a robot!");
+                    VCRobot rob = new VCRobot(Application, IceApp, comp, name);
                     Robots.Add(rob);
                 }
                 else
                 {
+                    Components.Add(new VCComponent(IceApp, comp, name));
+                    /*
                     object[] result = comp.findBehavioursOfType("ComponentSignal"); //create component for objects which have components signals
                     if (result.Length > 0)
                     {
-                        Components.Add(new VCComponent(IceApp, comp));
+                        Components.Add(new VCComponent(IceApp, comp, name));
                     }
+                     * */
                 }
                 return true;
             }
@@ -220,17 +227,16 @@ namespace vc2ice
 
             if (Added)
             {
-                addComponent(comp);
+                addComponent(comp, name);
             }
             else
             {
-                removeComponent(comp);
+                removeComponent(comp, name);
             }
 
         }
-        private void removeComponent(IvcComponent comp)
+        private void removeComponent(IvcComponent comp, string name)
         {
-            string name = (string)comp.getProperty("Name");
             Console.WriteLine("Removing:    " + name);
 
             for (int i = 0; i < Components.Count; i++)
@@ -270,11 +276,20 @@ namespace vc2ice
             //throw new NotImplementedException();
         }
 
-        public void notifyDynamicComponent(ref IvcComponent Component, ref IvcBehaviour Container, bool Added)
+        public void notifyDynamicComponent(ref IvcComponent comp, ref IvcBehaviour Container, bool Added)
         {
-
-            Console.WriteLine("Dynamic component added!!!!!!!!!!!!!!!!!: " + Added);
-
+            string cname = (string)comp.getProperty("Name");
+            Console.WriteLine("Dynamic component: " + cname + Added);
+            long sessionId = (long)comp.getProperty("SessionID");
+            cname = cname + sessionId.ToString();
+            if (Added)
+            {
+                addComponent(comp, cname);
+            }
+            else
+                removeComponent(comp, cname);
+            {
+            }
         }
 
         public void notifyExternalDragLeave()

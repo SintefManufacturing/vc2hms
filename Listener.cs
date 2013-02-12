@@ -11,7 +11,6 @@ namespace vc2ice
         String m_Type;
         hms.SignalPrx m_pub;
         icehms.IceApp IceApp;
-        int CompCounter;
         List<VCComponent> CompList;
 
 
@@ -22,7 +21,6 @@ namespace vc2ice
             m_Signal = signal;
             IvcEventProperty l_EProp = (IvcEventProperty)signal.getPropertyObject("Value");
             m_Type = m_Signal.getProperty("Type");
-            CompCounter = 0;
             CompList = new List<VCComponent>();
             //Console.WriteLine("Signal type is: " + m_Type);
 
@@ -69,6 +67,9 @@ namespace vc2ice
 
                         if (comp.RootNode != null)
                         {
+                            //find if component exist in ice world
+                            //(m_Signal.getProperty("Name")
+
                             /*
                             //first resend signal to Ice
                             CompCounter++;
