@@ -18,7 +18,7 @@ namespace vc2ice
 
         //public VCAppHolon(VCApp vcapp, icehms.IceApp iceapp)  :  base(iceapp, (string)vcapp.Application.getProperty("ApplicationName") , false)
         public VCAppHolon(IvcApplication vcapp, icehms.IceApp iceapp)
-            : base(iceapp, (IvcPropertyList2) vcapp, "Simulation")
+            : base(iceapp, (IvcPropertyList2)vcapp, "Simulation")
         {
             //we called base with activate=false so we need to create our own "tie servant"
             register((Ice.Object)new hms.SimulationTie_(this));
@@ -32,7 +32,7 @@ namespace vc2ice
 
         public void stop(Ice.Current current__)
         {
-             Application.setProperty("SimulationRunning", false);
+            Application.setProperty("SimulationRunning", false);
         }
 
         public void reset(Ice.Current current__)
@@ -43,7 +43,7 @@ namespace vc2ice
 
     }
 
-    public class VCApp: IvcClient2  
+    public class VCApp : IvcClient2
     {
         public IvcApplication Application;
         public List<VCRobot> Robots;
@@ -53,7 +53,7 @@ namespace vc2ice
         private VCAppHolon Holon;
 
 
-        public VCApp(icehms.IceApp app)  
+        public VCApp(icehms.IceApp app)
         {
             IceApp = app;
             Robots = new List<VCRobot>();
@@ -63,7 +63,7 @@ namespace vc2ice
             Holon = new VCAppHolon(Application, app);
 
             IvcClient client = (IvcClient)this;
-            Application.addClient(ref client);  
+            Application.addClient(ref client);
         }
 
         public void register(VCClient client)
@@ -86,53 +86,56 @@ namespace vc2ice
         }
 
         public void shutdown()
-        {        
+        {
 
             Holon.shutdown();
         }
 
-        public void updateDevicesList()
+        private bool isRobot(IvcComponent comp)
         {
-            reset();
+            object[] result = comp.findBehavioursOfType("RobotController");
+            if (result.Length > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
 
+        }
+        private bool isCreated(string name)
+        {
+            foreach (VCComponent holon in Components)
+            {
+                if (holon.getName() == name)
+                {
+                    return true;
+                }
+            }
+            foreach (VCRobot holon in Robots)
+            {
+                if (holon.getName() == name)
+                {
+                    return true;
+                }
+            }
+            return false;
+
+        }
+
+        public void createCurrentComponents()
+        {
             for (int i = 0; i < Application.ComponentCount; i++)
             {
                 IvcComponent comp = Application.getComponent(i);
-                string cname = (string)comp.getProperty("Name");
-                Console.WriteLine("Studying:    " + cname);
-                // find robots
-                object[] result = comp.findBehavioursOfType("RobotController");
-                bool registered = false;
-                for (int j = 0; j < result.Length; j++)
-                {
-                    Console.WriteLine(cname + " is a robot!");
-                    VCRobot rob = new VCRobot(Application, IceApp, comp);
-                    Robots.Add(rob);
-                    //double[] q = rob.getj();
-                    //q[0] += 100;
-                    //rob.movej(q, 2, 2);
-                    //rob.setDigitalOut(1, true);
-                    registered = true;
-
-                }
-                if (! registered )
-                {
-                // create the rest as vccomponents
-                result = comp.findBehavioursOfType("ComponentSignal");
-                if (result.Length > 0)
-                {
-                    Components.Add(new VCComponent(IceApp, comp));
-                    registered = true;
-                }
-                }
+                addComponent(comp);
             }
-
-
         }
-    
 
 
-           
+
+
         #region IvcClient Members
 
         public string ApplicationName
@@ -184,18 +187,72 @@ namespace vc2ice
             // when simulation state changes
         }
 
-        public void notifyWorld(ref IvcComponent Component, bool Added)
+
+        private bool addComponent(IvcComponent comp)
         {
-            Console.WriteLine("Warning clients of VC layout update");
-
-            foreach (VCClient client in m_clients)
+            string cname = (string)comp.getProperty("Name");
+            Console.WriteLine("Addind:    " + cname);
+            if (!isCreated(cname))
             {
+                if (isRobot(comp))
+                {
+                    Console.WriteLine(cname + " is a robot!");
+                    VCRobot rob = new VCRobot(Application, IceApp, comp);
+                    Robots.Add(rob);
+                }
+                else
+                {
+                    object[] result = comp.findBehavioursOfType("ComponentSignal"); //create component for objects which have components signals
+                    if (result.Length > 0)
+                    {
+                        Components.Add(new VCComponent(IceApp, comp));
+                    }
+                }
+                return true;
+            }
+            else { return false; }
 
-                client.VCUpdate();
+        }
+        public void notifyWorld(ref IvcComponent comp, bool Added)
+        {
+            string name = (string)comp.getProperty("Name");
+            Console.WriteLine("NotifyWorld says:    " + name + Added);
 
+            if (Added)
+            {
+                addComponent(comp);
+            }
+            else
+            {
+                removeComponent(comp);
             }
 
+        }
+        private void removeComponent(IvcComponent comp)
+        {
+            string name = (string)comp.getProperty("Name");
+            Console.WriteLine("Removing:    " + name);
 
+            for (int i = 0; i < Components.Count; i++)
+            {
+                VCComponent holon = Components[i];
+                if (holon.getName() == name)
+                {
+                    holon.shutdown();
+                    Components.Remove(holon);
+                    return;
+                }
+            }
+            for (int i = 0; i < Robots.Count; i++)
+            {
+                VCRobot holon = Robots[i];
+                if (holon.getName() == name)
+                {
+                    holon.shutdown();
+                    Robots.Remove(holon);
+                    return;
+                }
+            }
         }
 
         public bool queryContextMenu()

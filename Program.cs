@@ -24,7 +24,7 @@ namespace vc2ice
                 //iceapp = new IceApp("VC2IceAdapter", "192.168.1.15", 12000, false);
                 vcapp = new VCApp(iceapp);
                 //Application.Run(new Window(iceapp, vcapp));  
-                vcapp.updateDevicesList();
+                vcapp.createCurrentComponents();
                 while (true)
                 {
                     Thread.Sleep(10);

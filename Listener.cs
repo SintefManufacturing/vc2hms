@@ -69,12 +69,10 @@ namespace vc2ice
 
                         if (comp.RootNode != null)
                         {
+                            /*
                             //first resend signal to Ice
-                            //FIXME: should probably keep list of components for gc and use uniq names otherwise they are will be unreachable!!
                             CompCounter++;
-                            if (CompCounter > 6) { CompCounter = 0; }
-                            VCComponent mycomp = new VCComponent(IceApp, Property.ExtendedValue, true, false);
-                            CompList.Insert(CompCounter - 1, mycomp);
+                            //VCComponent mycomp = new VCComponent(IceApp, Property.ExtendedValue, true, false);
 
                             m_pub.newComponentSignal(m_Signal.getProperty("Name"), hms.ComponentPrxHelper.uncheckedCast(mycomp.Proxy));
                             //Now send a message
@@ -86,6 +84,7 @@ namespace vc2ice
                             msg.arguments.Add("SignalType", m_Type);
                             msg.arguments.Add("WorldPositionMatrix", String.Join(",", comp.RootNode.getProperty("WorldPositionMatrix")));
                             m_pub.putMessage(msg);
+                             * */
                         }
 
 
