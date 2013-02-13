@@ -13,6 +13,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -25,7 +26,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -55,6 +55,9 @@
     <Reference Include="Ice, Version=3.4.2.0, Culture=neutral, PublicKeyToken=cdd571ade22f2f16, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\ZeroC\Ice-3.4.2\bin\Ice.dll</HintPath>
+    </Reference>
+    <Reference Include="IceBox">
+      <HintPath>..\..\..\..\..\Program Files (x86)\ZeroC\Ice-3.4.2\bin\IceBox.dll</HintPath>
     </Reference>
     <Reference Include="IceGrid, Version=3.4.2.0, Culture=neutral, PublicKeyToken=cdd571ade22f2f16, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -94,7 +97,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="ClassDiagram1.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -154,7 +156,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\icehms\src\cs\IceHMS.csproj">
+    <ProjectReference Include="..\icehms\src\cs\IceHMS.csproj">
       <Project>{D6D54312-5DCE-457B-A3F3-4EE407ABFD4C}</Project>
       <Name>IceHMS</Name>
     </ProjectReference>
@@ -184,7 +186,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties ZerocIce_Tie="True" ZerocIce_IncludePath="C:\Users\olrd\Documents\icehms\slices|C:\Users\olrd\Documents\Visual Studio 2010\Projects\vc2ice\vc2ice" ZerocIce_Prefix="True" ZerocIce_OutputDir="." ZerocIce_Enabled="True" ZerocIce_VerboseLevel="2" />
+      <UserProperties ZerocIce_Tie="True" ZerocIce_IncludePath="C:\Users\olrd\Documents\GitHub\icehms\slices|C:\Users\olrd\Documents\GitHub\vc2icehms" ZerocIce_Prefix="True" ZerocIce_OutputDir="." ZerocIce_Enabled="True" ZerocIce_VerboseLevel="2" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

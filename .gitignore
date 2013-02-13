@@ -1,0 +1,10 @@
+*.dll
+*.exe
+*log
+bin/*
+obj/*
+*.swp
+*~
+vc2ice.cs
+*.suo
+
