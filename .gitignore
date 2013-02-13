@@ -7,4 +7,5 @@ obj/*
 *~
 vc2ice.cs
 *.suo
+*.user
 
