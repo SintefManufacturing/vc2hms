@@ -81,9 +81,9 @@
   <ItemGroup>
     <Compile Include="vc2ice.cs" />
     <Compile Include="VCComponent.cs" />
-    <Compile Include="vcapp.cs" />
+    <Compile Include="VCApp.cs" />
     <Compile Include="Helpers.cs" />
-    <Compile Include="Listener.cs" />
+    <Compile Include="SignalListener.cs" />
     <Compile Include="VCRobot.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

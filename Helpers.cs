@@ -23,6 +23,18 @@ namespace vc2ice
            return a;
         }
 
+        static public string formatMatrix(double[] m)
+        {
+            string s = "(";
+            for (int i = 0; i < m.Length; i++)
+            {
+                string tmp = m[i].ToString().Replace(",", ".");
+                s += tmp;
+            }
+            s += ")";
+            return s;
+        }
+
 
     }
 }

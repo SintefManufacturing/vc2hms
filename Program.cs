@@ -6,12 +6,9 @@ namespace vc2ice
 {
     static class Program
     {
-
         //[STAThread]
         static void Main()
         {
-
-
             icehms.IceApp iceapp = null;
             VCApp vcapp = null;
             try
@@ -21,22 +18,6 @@ namespace vc2ice
                 vcapp = new VCApp(iceapp);
                 Console.WriteLine("Press any key to exit");
                 Console.ReadLine();
-                /*
-               while (Console.ReadKey(true).Key != ConsoleKey.Escape)
-               {
-                   Thread.Sleep(10);
-               }
-               Console.WriteLine("VC2IceHMS Finished");
-               //Console.ReadKey(true);
-               
-                
-               while (true)
-               {
-                   Thread.Sleep(10);
-               }
-                   */
-                //System("pause");
-
             }
             catch (Exception ex)
             {
@@ -50,7 +31,7 @@ namespace vc2ice
                     {
                         vcapp.shutdown();
                     }
-                }       
+                }
                 finally
                 {
                     if (iceapp != null)
@@ -59,9 +40,8 @@ namespace vc2ice
                     }
                 }
             }
-            Console.WriteLine("Press any key to close");
+            Console.WriteLine("Press any key to close window");
             Console.ReadLine();
-
         }
     }
 }

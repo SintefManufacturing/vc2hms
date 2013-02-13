@@ -16,10 +16,10 @@ namespace vc2ice
         public VCObject(icehms.IceApp app, IvcPropertyList2 plist, string name)
             : base(app, name, false)
         {
-             PList = plist;
+            PList = plist;
         }
 
-    
+
         public string getProperty(string name, Ice.Current current__)
         {
             return Convert.ToString(PList.getProperty(name));
@@ -40,12 +40,13 @@ namespace vc2ice
             //everything comes as string from Ice so we must convert it to correct type
             IvcProperty prop = PList.getPropertyObject(name);
             //Type tp = prop.GetType();
-           
+
             //       log("SETPROP: " + prop.getProperty("Type"));
             //log("SETPROP: " + tp + prop + tp.ToString() + tp.MakeGenericType() ) ;
             //prop.Value =  Convert.ChangeType(val, (Type) prop.getProperty("Type")  );
             string stype = prop.getProperty("Type");
-            switch (stype) {
+            switch (stype)
+            {
                 case "Real":
                     prop.Value = Convert.ToDouble(val);
                     break;
@@ -60,7 +61,7 @@ namespace vc2ice
                     break;
             }
 
-       }
+        }
 
 
 
@@ -73,7 +74,7 @@ namespace vc2ice
         public IvcBehaviour Behaviour;
 
         public VCBehaviour(icehms.IceApp app, IvcBehaviour beha)
-            : base(app, (IvcPropertyList2) beha, (string)beha.getProperty("Name"))
+            : base(app, (IvcPropertyList2)beha, (string)beha.getProperty("Name"))
         {
             Behaviour = beha;
             register((Ice.Object)new hms.BehaviourTie_(this), false);
@@ -85,11 +86,11 @@ namespace vc2ice
     public class VCComponent : VCObject, hms.ComponentOperations_
     {
         public IvcComponent Component;
-        public List<Listener> Signals;
+        public List<SignalListener> Signals;
 
 
         public VCComponent(icehms.IceApp app, IvcComponent comp, string name, bool activate = true, bool icegrid = true)
-            : base(app, (IvcPropertyList2)comp, name)  
+            : base(app, (IvcPropertyList2)comp, name)
         {
             Component = comp;
             //Name = (string)comp.getProperty("Name"); //done in base class
@@ -98,9 +99,9 @@ namespace vc2ice
             {
                 register((Ice.Object)new hms.ComponentTie_(this), icegrid);
             }
-            Signals = new List<Listener>();
+            Signals = new List<SignalListener>();
             registerSignals();
-            
+
         }
 
         public override void shutdown()
@@ -111,29 +112,28 @@ namespace vc2ice
 
         private void registerSignals()
         {
-            object[] result = Component.findBehavioursOfType("ComponentSignal");
-            object[] result2 =   Component.findBehavioursOfType("BooleanSignal");
             List<object> list = new List<object>();
-            list.AddRange(result);
-            list.AddRange(result2);
+            list.AddRange(Component.findBehavioursOfType("ComponentSignal"));
+            list.AddRange(Component.findBehavioursOfType("BooleanSignal"));
+            list.AddRange(Component.findBehavioursOfType("IntegerSignal"));
+            list.AddRange(Component.findBehavioursOfType("StringSignal"));
+            list.AddRange(Component.findBehavioursOfType("MatrixSignal"));
+            list.AddRange(Component.findBehavioursOfType("RealSignal"));
             foreach (object behav in list)
             {
                 Console.WriteLine(Name + " has signal!");
-                Listener listen = new Listener(Name, (IvcPropertyList2)behav, IceApp);
+                SignalListener listen = new SignalListener(Name, (IvcPropertyList2)behav, IceApp);
                 Signals.Add(listen);
             }
-
         }
 
         private void deregisterSignals()
         {
-            foreach (Listener listen in Signals)
+            foreach (SignalListener listen in Signals)
             {
                 listen.shutdown();
             }
         }
-
-
 
         public string[] getBehaviourList(Ice.Current current__)
         {
@@ -144,18 +144,18 @@ namespace vc2ice
                 result[i] = b.getProperty("Name");
             }
             return result;
-           
+
         }
 
         public hms.BehaviourPrx getBehaviour(string name, Ice.Current current__)
         {
-            VCBehaviour tmp = new VCBehaviour( IceApp,  Component.findBehaviour(name) ) ;
+            VCBehaviour tmp = new VCBehaviour(IceApp, Component.findBehaviour(name));
             Console.WriteLine(tmp);
             //return (hms.Behaviour) tmp;
-            return   hms.BehaviourPrxHelper.checkedCast( tmp.Proxy) ;
+            return hms.BehaviourPrxHelper.checkedCast(tmp.Proxy);
         }
 
 
     }
-   
+
 }

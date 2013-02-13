@@ -4,26 +4,16 @@ using vcCOM;
 
 namespace vc2ice
 {
-
-
-    public interface VCClient
-    {
-        void VCUpdate();
-
-    }
-
     public class VCAppHolon : VCObject, hms.SimulationOperations_
     {
         public IvcApplication Application;
 
-        //public VCAppHolon(VCApp vcapp, icehms.IceApp iceapp)  :  base(iceapp, (string)vcapp.Application.getProperty("ApplicationName") , false)
         public VCAppHolon(IvcApplication vcapp, icehms.IceApp iceapp)
             : base(iceapp, (IvcPropertyList2)vcapp, "Simulation")
         {
             //we called base with activate=false so we need to create our own "tie servant"
             register((Ice.Object)new hms.SimulationTie_(this));
             Application = vcapp;
-
         }
 
         public void start(Ice.Current current__)
@@ -48,7 +38,6 @@ namespace vc2ice
     {
         public IvcApplication Application;
         public List<VCComponent> Components;
-        private List<VCClient> m_clients;
         private icehms.IceApp IceApp;
         private VCAppHolon Holon;
 
@@ -57,27 +46,18 @@ namespace vc2ice
         {
             IceApp = app;
             Components = new List<VCComponent>();
-            m_clients = new List<VCClient>();
             Application = (IvcApplication)new vc3DCreate.vcc3DCreate();
             Holon = new VCAppHolon(Application, app);
-
-            IvcClient client = (IvcClient)this;
-            Application.addClient(ref client);
+            Application.addClient(this);
             createCurrentComponents();
         }
-
-        public void register(VCClient client)
-        {
-            m_clients.Add(client);
-        }
-
 
         public void shutdown()
         {
             Application.removeClient(this);
-            foreach (VCComponent holon in Components)
+            foreach (VCComponent comp in Components)
             {
-                holon.shutdown();
+                comp.shutdown();
             }
             Holon.shutdown();
         }
@@ -123,7 +103,7 @@ namespace vc2ice
 
         public string ApplicationName
         {
-            get { throw new NotImplementedException(); }
+            get { return "VC2IceHMS"; }
         }
 
         public void notifyApplication(bool AppReady)
