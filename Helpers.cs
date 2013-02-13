@@ -26,9 +26,11 @@ namespace vc2ice
         static public string formatMatrix(double[] m)
         {
             string s = "";
+            double d;
             for (int i = 0; i < m.Length; i++)
             {
-                string tmp = m[i].ToString().Replace(",", ".");
+                d = m[i] / 1000;
+                string tmp = d.ToString().Replace(",", ".");
                 if (i != 0) { s += ","; } 
                 s = s  + tmp;
             }

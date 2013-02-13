@@ -79,6 +79,8 @@ namespace vc2ice
             Behaviour = beha;
             register((Ice.Object)new hms.BehaviourTie_(this), false);
         }
+
+
     }
 
 
@@ -87,13 +89,14 @@ namespace vc2ice
     {
         public IvcComponent Component;
         public List<SignalListener> Signals;
+        public List<VCBehaviour>  Behaviours;
 
 
         public VCComponent(icehms.IceApp app, IvcComponent comp, string name, bool activate = true, bool icegrid = true)
             : base(app, (IvcPropertyList2)comp, name)
         {
             Component = comp;
-            //Name = (string)comp.getProperty("Name"); //done in base class
+            Behaviours = new List<VCBehaviour>();
 
             if (activate)
             {
@@ -106,6 +109,10 @@ namespace vc2ice
 
         public override void shutdown()
         {
+            foreach (VCBehaviour b in Behaviours)
+            {
+                b.shutdown();
+            }
             deregisterSignals();
             base.shutdown();
         }
@@ -150,6 +157,7 @@ namespace vc2ice
         public hms.BehaviourPrx getBehaviour(string name, Ice.Current current__)
         {
             VCBehaviour tmp = new VCBehaviour(IceApp, Component.findBehaviour(name));
+            Behaviours.Add(tmp);
             Console.WriteLine(tmp);
             //return (hms.Behaviour) tmp;
             return hms.BehaviourPrxHelper.checkedCast(tmp.Proxy);

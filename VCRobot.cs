@@ -65,8 +65,7 @@ namespace vc2ice
             //}
 
             double end = Motion.getCycleTimeAtTarget(Motion.TargetCount - 1);
-            Console.WriteLine("Computed time: " + Convert.ToString(end));
-            Console.WriteLine("Starting move");
+            //Console.WriteLine("Starting move");
 
             StartTime = App.getProperty("SimTime");
             EndTime = StartTime + end;
@@ -154,7 +153,7 @@ namespace vc2ice
             {
                 bjoints[i] = Target.getJointValue(i);
             }
-            Helpers.printMatrix("Interpolated joint pose is: ", bjoints);
+            //Helpers.printMatrix("Interpolated joint pose is: ", bjoints);
             return bjoints;
         }  
     }
@@ -319,7 +318,7 @@ namespace vc2ice
             currentCSYS = cref;
         }
 
-        public void movel(double[] pose, double acc = 0.01, double speed = 0.01, Ice.Current icecurrent=null)
+        public void movel(double[] pose, double acc = 0.01, double vel = 0.01, Ice.Current icecurrent=null)
         {
             log("New move command: ");
             for (int i = 0; i < pose.Length; i++)
@@ -328,7 +327,7 @@ namespace vc2ice
             }
             lock (this)
             {
-                CurrentMove = new Move(App, MoveType.Linear, Controller, pose, speed*1000, acc*1000, currentCSYS);
+                CurrentMove = new Move(App, MoveType.Linear, Controller, pose, vel*1000, acc*1000, currentCSYS);
             }
             while ( isProgramRunning() == true ){
                 Thread.Sleep(10);
@@ -368,7 +367,6 @@ namespace vc2ice
             {
                 if (CurrentMove != null)
                 {
-                    log("Run method: moving");
                     setJointsPos(CurrentMove.getPose());
                     if (CurrentMove.isFinished())
                     {
