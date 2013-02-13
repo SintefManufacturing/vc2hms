@@ -172,14 +172,14 @@ namespace vc2ice
         private Move CurrentMove;
         private IvcSignalMap DigitalInput;
         private IvcSignalMap DigitalOutput;
-        private hms.CSYS defaultCSYS = hms.CSYS.World;
+        private hms.CSYS currentCSYS = hms.CSYS.World;
 
 
         public VCRobot(IvcApplication vc, icehms.IceApp app, IvcComponent robot, string name)  : base (app, robot, name, false)
         {
             //we called base with activate=false so we need to create our own "tie servant"
             register((Ice.Object)new hms.RobotTie_(this));
-            defaultCSYS = hms.CSYS.World;
+            currentCSYS = hms.CSYS.World;
             App = vc;
             object[] result = Component.findBehavioursOfType("RobotController");
             if (result.Length == 0)
@@ -196,7 +196,6 @@ namespace vc2ice
                 {
                     
                     string jointname = (string)Controller.getJoint(k).getProperty("Name");
-                    log("Joint: "+ k+ " "+ jointname); 
                     IvcEventProperty joint = (IvcEventProperty)compprops.getPropertyObject(jointname);
                     Joints.Add(joint);
                 }
@@ -205,8 +204,10 @@ namespace vc2ice
             result = Component.findBehavioursOfType("RslExecutor");
             Executor = (IvcExecutor) result[0];  
             Executor.addExecutorClient(this);
-             IvcRslExecutor rslex =  (IvcRslExecutor) Executor;
+            // IvcRslExecutor rslex =  (IvcRslExecutor) Executor;
             ((IvcPropertyList)Executor).setProperty("ExecutionMode", true);  //we are ready
+
+            //testing
             string pname = ((IvcPropertyList)Executor).getProperty("DigitalMapIn");
             DigitalInput = (IvcSignalMap) Component.findBehaviour(pname);
             pname = ((IvcPropertyList)Executor).getProperty("DigitalMapOut");
@@ -215,11 +216,19 @@ namespace vc2ice
             //DigitalOutput.getPortSignal(2);
         }
 
+        public override void shutdown()
+        {
+            ((IvcPropertyList)Executor).setProperty("ExecutionMode", false);  //we are ready
+            Executor.removeExecutorClient(this);
+            base.shutdown();
+        }
+
 
         public void setCSYS(hms.CSYS csys, Ice.Current current = null)
         {
-            defaultCSYS = csys;
+            currentCSYS = csys;
         }
+
         public List<string> getJoints()
         {
             List<string> list = new List<string>();
@@ -265,12 +274,12 @@ namespace vc2ice
         {
             for (int i=0; i < pose.Length; i++ )
             {
-                pose[i] = pose[i] * 180 / 3.14159;
+                pose[i] = pose[i] * 180 / Math.PI;
             }
             log("New joint move command: ");
             lock (this)
             {
-                CurrentMove = new Move(App, MoveType.Joint, Controller, pose, speed*180/3.141, acc*180/3.141);
+                CurrentMove = new Move(App, MoveType.Joint, Controller, pose, speed * 180 / Math.PI, acc * 180 / Math.PI);
             }
             while ( isProgramRunning() == true ){
                 Thread.Sleep(50);
@@ -284,10 +293,10 @@ namespace vc2ice
             IvcMotionInterpolator motion = Controller.createMotionInterpolator();
             IvcMotionTarget target = Controller.createTarget();
             double[] matrix;
-            switch (defaultCSYS)
+            switch (currentCSYS)
             {
                 case hms.CSYS.Base:
-                     matrix = target.RobotRootToRobotFlangeMatrix.Copy();
+                     matrix = target.RobotRootToRobotFlangeMatrix.Clone();
                      for (int i = 0; i < matrix.Length; i++)
                      {
                          matrix[i] = matrix[i] / 1000;
@@ -307,7 +316,7 @@ namespace vc2ice
         }
 
         public void setCSYS(hms.CSYS cref){
-            defaultCSYS = cref;
+            currentCSYS = cref;
         }
 
         public void movel(double[] pose, double acc = 0.01, double speed = 0.01, Ice.Current icecurrent=null)
@@ -319,14 +328,12 @@ namespace vc2ice
             }
             lock (this)
             {
-                CurrentMove = new Move(App, MoveType.Linear, Controller, pose, speed*1000, acc*1000, defaultCSYS);
+                CurrentMove = new Move(App, MoveType.Linear, Controller, pose, speed*1000, acc*1000, currentCSYS);
             }
             while ( isProgramRunning() == true ){
-                Thread.Sleep(50);
+                Thread.Sleep(10);
             }
         }
-
-
 
         public void notifyBinaryInputValueChange(int Index, bool Value)
         {

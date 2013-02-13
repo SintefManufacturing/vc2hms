@@ -16,22 +16,22 @@ namespace vc2ice
         }
         static public double[] AddMatrix(double[] a, double[] b)
         {
-           for (int i = 0; i < a.Length; i++)
-            { 
-               a[i] += b[i];
+            for (int i = 0; i < a.Length; i++)
+            {
+                a[i] += b[i];
             }
-           return a;
+            return a;
         }
 
         static public string formatMatrix(double[] m)
         {
-            string s = "(";
+            string s = "";
             for (int i = 0; i < m.Length; i++)
             {
                 string tmp = m[i].ToString().Replace(",", ".");
-                s += tmp;
+                if (i != 0) { s += ","; } 
+                s = s  + tmp;
             }
-            s += ")";
             return s;
         }
 
