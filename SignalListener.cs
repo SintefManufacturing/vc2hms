@@ -96,14 +96,13 @@ namespace vc2ice
 
         public void notifyValueChanged(ref IvcProperty Property, object Value)
         {
+            Console.WriteLine(getID() + " got signal of type: " + Value.GetType() + " and value: ", Value); 
             if (m_Type == "ComponentSignal")
             {
-                Console.WriteLine(getID() + " got Component Signal for comp " + Value + " of type: " + Value.GetType());
                 IvcComponent comp = (IvcComponent)Property.ExtendedValue;
                 //IvcComponent comp = getComponent(ref Property, Value);
                 if (comp != null)
                 {
-                    Console.WriteLine("Find if holon exist");
                     //find if holon exist for component
                     string name = comp.getProperty("Name");
                     string dname = name + comp.getProperty("SessionID"); //name for dynamic components
@@ -115,10 +114,9 @@ namespace vc2ice
                     }
                     if (prx != null)
                     {
-                        Console.WriteLine("Sending event and msg");
                         //m_pub.newComponentSignal(m_Signal.getProperty("Name"), hms.ComponentPrxHelper.uncheckedCast(prx));
                         //Now send a message
-                        Helpers.printMatrix("comp pose: ", comp.RootNode.getProperty("WorldPositionMatrix"));
+                        //Helpers.printMatrix("comp pose: ", comp.RootNode.getProperty("WorldPositionMatrix"));
                         hms.Message msg = createMessage();
                         msg.arguments.Add("ComponentName", dname);
                         msg.arguments.Add("WorldPositionMatrix", Helpers.formatMatrix(comp.RootNode.getProperty("WorldPositionMatrix")));
@@ -132,7 +130,6 @@ namespace vc2ice
                 //first resend signal to Ice
                 //m_pub.newBooleanSignal(m_Signal.getProperty("Name"), Property.ExtendedValue);
                 //Now send a message
-                Console.WriteLine(getID() + " got Boolean Signal " + (string)m_Signal.getProperty("Name") + "  " + Value.ToString() + " re-sending it to icehms");
                 hms.Message msg = createMessage();
                 m_pub.putMessage(msg);
             }

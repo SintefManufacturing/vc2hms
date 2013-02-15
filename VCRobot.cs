@@ -25,33 +25,32 @@ namespace vc2ice
     }
 
     public enum MoveType { Linear, Joint };
+
+
     public class Move
     {
         IvcMotionInterpolator Motion;
         IvcMotionTarget Target;
-        private IvcRobot Controller;
-        
-        double StartTime; 
+        private VCRobot Robot;
+
+        double StartTime;
         double EndTime;
-        IvcApplication  App;
-        hms.CSYS CSRef;
 
-        public Move(IvcApplication app, MoveType move, IvcRobot controller, double[] pose, double speed = 2, double acc = 1, hms.CSYS cref = hms.CSYS.World)
+        public Move(VCRobot robot, MoveType move, double[] pose, double vel, double acc)
         {
-            Controller = controller;
-            Motion = Controller.createMotionInterpolator();
-            Target = Controller.createTarget();
-            CSRef = cref;
+            Robot = robot;
+            Motion = Robot.Controller.createMotionInterpolator();
+            Target = Robot.Controller.createTarget();
+            Target.JointSpeed = 100; // % of max specified speed
 
-            App = app;
 
             if (move == MoveType.Linear)
             {
-                setupLinearMove(pose);
+                setupLinearMove(pose, vel);
             }
             else
             {
-                setupJointMove(pose);
+                setupJointMove(pose, vel);
             }
 
 
@@ -59,37 +58,39 @@ namespace vc2ice
             //Target.getConfigWarning(0);
             //Target.getConfigWarning(1);
 
-            //if ( Target.getConfigWarning(Motion.TargetCount - 1) == 1) 
-            //{
-            //   throw(new UnreachableException("Target is not reachable"));
-            //}
+            if (Target.getConfigWarning(Motion.TargetCount - 1) == 1)
+            {
+                throw (new UnreachableException("Target is not reachable"));
+            }
 
             double end = Motion.getCycleTimeAtTarget(Motion.TargetCount - 1);
             //Console.WriteLine("Starting move");
 
-            StartTime = App.getProperty("SimTime");
+            StartTime = Robot.App.getProperty("SimTime");
             EndTime = StartTime + end;
         }
 
-        public void setupLinearMove(double[] pose)
+        public void setupLinearMove(double[] pose, double vel)
         {
             Target.MotionType = 1; // 1 is Linear, 0 joint
-            switch (CSRef)
+            Target.CartesianSpeed = vel;
+
+            if (Robot.currentCSYS == hms.CSYS.World)
             {
-                case hms.CSYS.Base:
-                    Target.TargetMode = 1; // robot base as reference
-                    break;
-                case hms.CSYS.World:
-                    Target.TargetMode = 4; //  world as reference
-                    break;
-                default:
-                    goto case hms.CSYS.World;
+                Target.TargetMode = 4;
+            }
+            else if (Robot.currentCSYS == hms.CSYS.Base)
+            {
+                Target.TargetMode = 1;
+            }
+            else
+            {
+                throw (new NotImplementedException(string.Format("Support for % not implemented yet", Robot.currentCSYS.ToString())));
 
             }
-            double[] current = Target.RobotRootToRobotFlangeMatrix;
 
             //adding start point to trajectory
-            Target.TargetMatrix = current;
+            Target.TargetMatrix = Robot.getl_mm();
             Motion.addTarget(ref Target);
             Target.CurrentConfig = Target.NearestConfig;
 
@@ -98,10 +99,11 @@ namespace vc2ice
             Motion.addTarget(ref Target);
         }
 
-        public void setupJointMove(double[] pose)
+        public void setupJointMove(double[] pose, double vel)
         {
             Target.MotionType = 0; // 1 is Linear, 0 joint
             Target.TargetMode = 1; // robot base as reference
+            Target.AngularSpeed = vel;
 
             double[] current = Target.RobotRootToRobotFlangeMatrix;
 
@@ -121,12 +123,13 @@ namespace vc2ice
 
         public bool isFinished()
         {
-            double t = App.getProperty("SimTime");
-            if (t > EndTime ) 
+            double t = Robot.App.getProperty("SimTime");
+            if (t > EndTime)
             {
                 return true;
             }
-            else{
+            else
+            {
                 return false;
             }
 
@@ -134,13 +137,13 @@ namespace vc2ice
 
         public double[] getPose()
         {
-            double[] bjoints = new double[Controller.JointCount];
-            double now = App.getProperty("SimTime");
+            double[] bjoints = new double[Robot.Controller.JointCount];
+            double now = Robot.App.getProperty("SimTime");
             if (now > EndTime)
             {
                 now = EndTime;
             }
-            now =  now - StartTime;
+            now = now - StartTime;
             try
             {
                 Motion.interpolate(now, ref Target);
@@ -155,26 +158,27 @@ namespace vc2ice
             }
             //Helpers.printMatrix("Interpolated joint pose is: ", bjoints);
             return bjoints;
-        }  
+        }
     }
-    
 
- 
+
+
     public class VCRobot : VCComponent, hms.RobotOperations_, IvcExecutorClient
     {
-        private IvcRobot Controller;
+        public IvcRobot Controller;
         private List<IvcEventProperty> Joints;
-        private IvcApplication App;
+        public IvcApplication App;
         //private hms.RobotMotionCommandTie_ RobotServant;
         //public override hms.HolonTie Servant { get; set; }
         private IvcExecutor Executor;
         private Move CurrentMove;
         private IvcSignalMap DigitalInput;
         private IvcSignalMap DigitalOutput;
-        private hms.CSYS currentCSYS = hms.CSYS.World;
+        public hms.CSYS currentCSYS = hms.CSYS.World;
 
 
-        public VCRobot(IvcApplication vc, icehms.IceApp app, IvcComponent robot, string name)  : base (app, robot, name, false)
+        public VCRobot(IvcApplication vc, icehms.IceApp app, IvcComponent robot, string name)
+            : base(app, robot, name, false)
         {
             //we called base with activate=false so we need to create our own "tie servant"
             register((Ice.Object)new hms.RobotTie_(this));
@@ -187,31 +191,31 @@ namespace vc2ice
             }
             else
             {
-                Controller = (IvcRobot) result[0];
+                Controller = (IvcRobot)result[0];
                 // controller is set now populate the joints list
                 IvcPropertyList2 compprops = (IvcPropertyList2)Component;
                 Joints = new List<IvcEventProperty>();
                 for (int k = 0; k < Controller.JointCount; k++)
                 {
-                    
+
                     string jointname = (string)Controller.getJoint(k).getProperty("Name");
                     IvcEventProperty joint = (IvcEventProperty)compprops.getPropertyObject(jointname);
                     Joints.Add(joint);
                 }
-            }          
+            }
             //executor stuff
             result = Component.findBehavioursOfType("RslExecutor");
-            Executor = (IvcExecutor) result[0];  
+            Executor = (IvcExecutor)result[0];
             Executor.addExecutorClient(this);
             // IvcRslExecutor rslex =  (IvcRslExecutor) Executor;
             ((IvcPropertyList)Executor).setProperty("ExecutionMode", true);  //we are ready
 
             //testing
             string pname = ((IvcPropertyList)Executor).getProperty("DigitalMapIn");
-            DigitalInput = (IvcSignalMap) Component.findBehaviour(pname);
+            DigitalInput = (IvcSignalMap)Component.findBehaviour(pname);
             pname = ((IvcPropertyList)Executor).getProperty("DigitalMapOut");
             DigitalOutput = (IvcSignalMap)Component.findBehaviour(pname);
-            log("nb ports output; " + DigitalOutput.getProperty("PortCount"));
+            //log("nb ports output; " + DigitalOutput.getProperty("PortCount"));
             //DigitalOutput.getPortSignal(2);
         }
 
@@ -238,13 +242,13 @@ namespace vc2ice
             return list;
         }
 
-        public double[] getj(Ice.Current current=null)
+        public double[] getj(Ice.Current current = null)
         {
             List<double> list = new List<double>();
             foreach (IvcEventProperty j in Joints)
             {
                 list.Add(j.Value * 3.14159 / 180);
-            }         
+            }
             return list.ToArray();
         }
 
@@ -260,7 +264,7 @@ namespace vc2ice
 
         public void setJointsPos(double[] pose)
         {
-            for(int i=0; i < Joints.Count; i++)
+            for (int i = 0; i < Joints.Count; i++)
             {
                 //Console.WriteLine("Moving joint: " + i.ToString() + " to " + pose[i].ToString());
                 IvcEventProperty j = Joints[i];
@@ -269,67 +273,88 @@ namespace vc2ice
 
         }
 
-        public void movej(double[] pose, double acc = 0.1, double speed=0.05, Ice.Current icecurrent=null)
+        public void movej(double[] pose, double acc = 0.1, double vel = 0.05, Ice.Current icecurrent = null)
         {
-            for (int i=0; i < pose.Length; i++ )
+            for (int i = 0; i < pose.Length; i++)
             {
                 pose[i] = pose[i] * 180 / Math.PI;
             }
-            log("New joint move command: ");
+            Helpers.printMatrix("New joint move command", pose);
             lock (this)
             {
-                CurrentMove = new Move(App, MoveType.Joint, Controller, pose, speed * 180 / Math.PI, acc * 180 / Math.PI);
+                CurrentMove = new Move(this, MoveType.Joint, pose, vel * 180 / Math.PI, acc * 180 / Math.PI);
             }
-            while ( isProgramRunning() == true ){
+            while (isProgramRunning() == true && !isShutdown())
+            {
                 Thread.Sleep(50);
             }
         }
 
-
-
-        public double[] getl(Ice.Current current=null)
+        public void translate(double[] pos, double acc, double vel, Ice.Current current = null)
         {
-            IvcMotionInterpolator motion = Controller.createMotionInterpolator();
-            IvcMotionTarget target = Controller.createTarget();
+            double[] pose = getl();
+            pose[0] = pos[0];
+            pose[1] = pos[1];
+            pose[2] = pos[2];
+            movel(pose, acc, vel);
+        }
+
+        public void orient(double[] orientation, double acc, double vel, Ice.Current current = null)
+        {
+            double[] pose = getl();
+            pose[3] = orientation[0];
+            pose[4] = orientation[1];
+            pose[5] = orientation[2];
+            movel(pose, acc, vel);
+        }
+
+        public double[] getl_mm(IvcMotionTarget target = null)
+        {
+            if (target == null) { target = Controller.createTarget(); }
             double[] matrix;
             switch (currentCSYS)
             {
                 case hms.CSYS.Base:
-                     matrix = target.RobotRootToRobotFlangeMatrix.Clone();
-                     for (int i = 0; i < matrix.Length; i++)
-                     {
-                         matrix[i] = matrix[i] / 1000;
-                     }
+                    matrix = target.RobotRootToRobotFlangeMatrix.Clone();
                     return matrix;
+
                 case hms.CSYS.World:
-                    matrix = Helpers.AddMatrix(target.WorldToRootNodeMatrix, target.RootNodeToRobotRootMatrix );
-                    matrix = Helpers.AddMatrix(matrix, target.RobotRootToRobotFlangeMatrix );
-                    for (int i = 0; i < matrix.Length; i++)
-                    {
-                        matrix[i] = matrix[i] / 1000;
-                    }
+                    matrix = Helpers.AddMatrix(target.WorldToRootNodeMatrix, target.RootNodeToRobotRootMatrix);
+                    matrix = Helpers.AddMatrix(matrix, target.RobotRootToRobotFlangeMatrix);
                     return matrix;
                 default:
-                    goto case hms.CSYS.World;       
+                    goto case hms.CSYS.World;
             }
         }
 
-        public void setCSYS(hms.CSYS cref){
+        public double[] getl(Ice.Current current = null)
+        {
+            double[] matrix = getl_mm();
+            for (int i = 0; i < matrix.Length; i++)
+            {
+                matrix[i] = matrix[i] / 1000;
+            }
+            return matrix;
+        }
+
+        public void setCSYS(hms.CSYS cref)
+        {
             currentCSYS = cref;
         }
 
-        public void movel(double[] pose, double acc = 0.01, double vel = 0.01, Ice.Current icecurrent=null)
+        public void movel(double[] pose, double acc = 0.01, double vel = 0.01, Ice.Current icecurrent = null)
         {
-            log("New move command: ");
+            log("New move command: " + Helpers.strMatrix(pose));
             for (int i = 0; i < pose.Length; i++)
             {
                 pose[i] = pose[i] * 1000;
             }
             lock (this)
             {
-                CurrentMove = new Move(App, MoveType.Linear, Controller, pose, vel*1000, acc*1000, currentCSYS);
+                CurrentMove = new Move(this, MoveType.Linear, pose, vel * 1000, acc * 1000);
             }
-            while ( isProgramRunning() == true ){
+            while (isProgramRunning() == true && !isShutdown())
+            {
                 Thread.Sleep(10);
             }
         }
@@ -382,7 +407,7 @@ namespace vc2ice
         {
             if (CurrentMove != null)
             {
-                return ! CurrentMove.isFinished();
+                return !CurrentMove.isFinished();
             }
             return false;
         }
@@ -394,7 +419,7 @@ namespace vc2ice
 
         public void notifyStopSimulation()
         {
- 
+
         }
 
         public void notifyStringInputValueChange(int Index, string Value)
@@ -419,40 +444,40 @@ namespace vc2ice
 
         public void queryStringIOConfiguration(ref int Inputs, ref int Outputs)
         {
- 
+
         }
 
 
 
-        public void setDigitalOut(int nb, bool val, Ice.Current current__=null)
+        public void setDigitalOut(int nb, bool val, Ice.Current current__ = null)
         {
             Executor.setBinaryOutput(0, nb, val);
             //IvcSignal sig =   DigitalOutput.getPortSignal(nb);
             //sig.setProperty("Value", val);
         }
 
-        public void setAnalogOut(int nb, bool val, Ice.Current current__=null)
+        public void setAnalogOut(int nb, bool val, Ice.Current current__ = null)
         {
             throw new NotImplementedException();
         }
 
-        public bool getDigitalInput(int nb, Ice.Current current__=null)
+        public bool getDigitalInput(int nb, Ice.Current current__ = null)
         {
             IvcSignal sig = DigitalOutput.getPortSignal(nb);
             return sig.getProperty("Value");
         }
 
-        public bool getAnalogInput(int nb, Ice.Current current__=null)
+        public bool getAnalogInput(int nb, Ice.Current current__ = null)
         {
             throw new NotImplementedException();
         }
 
-        public void setTool(int tool, Ice.Current current__=null)
+        public void setTool(int tool, Ice.Current current__ = null)
         {
             throw new NotImplementedException();
         }
 
-        public void setTCP(double[] tcp, Ice.Current current__=null)
+        public void setTCP(double[] tcp, Ice.Current current__ = null)
         {
             throw new NotImplementedException();
         }

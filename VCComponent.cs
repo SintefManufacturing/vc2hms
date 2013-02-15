@@ -89,7 +89,8 @@ namespace vc2ice
     {
         public IvcComponent Component;
         public List<SignalListener> Signals;
-        public List<VCBehaviour>  Behaviours;
+        public List<VCBehaviour> Behaviours;
+        private bool _shutdown = false;
 
 
         public VCComponent(icehms.IceApp app, IvcComponent comp, string name, bool activate = true, bool icegrid = true)
@@ -105,6 +106,10 @@ namespace vc2ice
             Signals = new List<SignalListener>();
             registerSignals();
 
+        }
+        public bool isShutdown()
+        {
+            return _shutdown;
         }
 
         public override void shutdown()
@@ -128,7 +133,6 @@ namespace vc2ice
             list.AddRange(Component.findBehavioursOfType("RealSignal"));
             foreach (object behav in list)
             {
-                Console.WriteLine(Name + " has signal!");
                 SignalListener listen = new SignalListener(Name, (IvcPropertyList2)behav, IceApp);
                 Signals.Add(listen);
             }

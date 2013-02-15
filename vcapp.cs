@@ -6,30 +6,33 @@ namespace vc2ice
 {
     public class VCAppHolon : VCObject, hms.SimulationOperations_
     {
-        public IvcApplication Application;
+        public VCApp vcapp;
 
-        public VCAppHolon(IvcApplication vcapp, icehms.IceApp iceapp)
-            : base(iceapp, (IvcPropertyList2)vcapp, "Simulation")
+        public VCAppHolon(VCApp vcapp, icehms.IceApp iceapp)
+            : base(iceapp, (IvcPropertyList2)vcapp.Application, "Simulation")
         {
             //we called base with activate=false so we need to create our own "tie servant"
             register((Ice.Object)new hms.SimulationTie_(this));
-            Application = vcapp;
+            this.vcapp = vcapp;
         }
 
         public void start(Ice.Current current__)
         {
-            Application.setProperty("SimulationRunning", true);
+            vcapp.start_simulation();
         }
 
         public void stop(Ice.Current current__)
         {
-            Application.setProperty("SimulationRunning", false);
+            vcapp.stop_simulation();
         }
 
         public void reset(Ice.Current current__)
         {
-            IvcCommand l_restart = Application.getCommand("resetSimulation");
-            l_restart.start();
+            vcapp.reset_simulation();
+        }
+        public bool isSimulationRunning(Ice.Current current__)
+        {
+            return vcapp.isSimulationRunning();
         }
 
     }
@@ -47,7 +50,7 @@ namespace vc2ice
             IceApp = app;
             Components = new List<VCComponent>();
             Application = (IvcApplication)new vc3DCreate.vcc3DCreate();
-            Holon = new VCAppHolon(Application, app);
+            Holon = new VCAppHolon(this, app);
             Application.addClient(this);
             createCurrentComponents();
         }
@@ -60,6 +63,28 @@ namespace vc2ice
                 comp.shutdown();
             }
             Holon.shutdown();
+        }
+
+
+        public void start_simulation()
+        {
+            Application.setProperty("SimulationRunning", true);
+        }
+
+        public void stop_simulation()
+        {
+            Application.setProperty("SimulationRunning", false);
+        }
+
+        public void reset_simulation()
+        {
+            IvcCommand l_restart = Application.getCommand("resetSimulation");
+            l_restart.start();
+        }
+
+        public bool isSimulationRunning()
+        {
+            return Application.getProperty("SimulationRunning");
         }
 
         private bool isRobot(IvcComponent comp)
@@ -159,7 +184,6 @@ namespace vc2ice
 
         private bool addComponent(IvcComponent comp, string name)
         {
-            Console.WriteLine("Adding:    " + name);
             if (!isCreated(name))
             {
                 VCComponent mycomp;
@@ -181,7 +205,7 @@ namespace vc2ice
         public void notifyWorld(ref IvcComponent comp, bool Added)
         {
             string name = (string)comp.getProperty("Name");
-            Console.WriteLine("NotifyWorld says:    " + name + Added);
+            //Console.WriteLine("NotifyWorld says:    " + name + Added);
 
             if (Added)
             {
@@ -195,8 +219,6 @@ namespace vc2ice
         }
         private void removeComponent(IvcComponent comp, string name)
         {
-            Console.WriteLine("Removing:    " + name);
-
             for (int i = 0; i < Components.Count; i++)
             {
                 VCComponent holon = Components[i];
@@ -227,7 +249,7 @@ namespace vc2ice
         public void notifyDynamicComponent(ref IvcComponent comp, ref IvcBehaviour Container, bool Added)
         {
             string cname = (string)comp.getProperty("Name");
-            Console.WriteLine("Dynamic component: " + cname + Added);
+            //Console.WriteLine("Dynamic component: " + cname + Added);
             long sessionId = (long)comp.getProperty("SessionID");
             cname = cname + sessionId.ToString();
             if (Added)
