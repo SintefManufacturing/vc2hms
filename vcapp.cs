@@ -104,7 +104,7 @@ namespace vc2ice
         {
             foreach (VCComponent holon in Components)
             {
-                if (holon.getName() == name)
+                if (holon.get_name() == name)
                 {
                     return true;
                 }
@@ -222,7 +222,7 @@ namespace vc2ice
             for (int i = 0; i < Components.Count; i++)
             {
                 VCComponent holon = Components[i];
-                if (holon.getName() == name)
+                if (holon.get_name() == name)
                 {
                     holon.shutdown();
                     Components.Remove(holon);

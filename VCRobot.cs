@@ -227,7 +227,7 @@ namespace vc2ice
         }
 
 
-        public void setCSYS(hms.CSYS csys, Ice.Current current = null)
+        public void set_csys(hms.CSYS csys, Ice.Current current = null)
         {
             currentCSYS = csys;
         }
@@ -284,7 +284,7 @@ namespace vc2ice
             {
                 CurrentMove = new Move(this, MoveType.Joint, pose, vel * 180 / Math.PI, acc * 180 / Math.PI);
             }
-            while (isProgramRunning() == true && !isShutdown())
+            while (is_program_running() == true && !isShutdown())
             {
                 Thread.Sleep(50);
             }
@@ -337,7 +337,7 @@ namespace vc2ice
             return matrix;
         }
 
-        public void setCSYS(hms.CSYS cref)
+        public void set_csys(hms.CSYS cref)
         {
             currentCSYS = cref;
         }
@@ -353,7 +353,7 @@ namespace vc2ice
             {
                 CurrentMove = new Move(this, MoveType.Linear, pose, vel * 1000, acc * 1000);
             }
-            while (isProgramRunning() == true && !isShutdown())
+            while (is_program_running() == true && !isShutdown())
             {
                 Thread.Sleep(10);
             }
@@ -403,7 +403,7 @@ namespace vc2ice
             Executor.freeze();
 
         }
-        public bool isProgramRunning(Ice.Current icecurrent = null)
+        public bool is_program_running(Ice.Current icecurrent = null)
         {
             if (CurrentMove != null)
             {
@@ -449,47 +449,47 @@ namespace vc2ice
 
 
 
-        public void setDigitalOut(int nb, bool val, Ice.Current current__ = null)
+        public void set_digital_out(int nb, bool val, Ice.Current current__ = null)
         {
             Executor.setBinaryOutput(0, nb, val);
             //IvcSignal sig =   DigitalOutput.getPortSignal(nb);
             //sig.setProperty("Value", val);
         }
 
-        public void setAnalogOut(int nb, bool val, Ice.Current current__ = null)
+        public void set_analog_out(int nb, bool val, Ice.Current current__ = null)
         {
             throw new NotImplementedException();
         }
 
-        public bool getDigitalInput(int nb, Ice.Current current__ = null)
+        public bool get_digital_input(int nb, Ice.Current current__ = null)
         {
             IvcSignal sig = DigitalOutput.getPortSignal(nb);
             return sig.getProperty("Value");
         }
 
-        public bool getAnalogInput(int nb, Ice.Current current__ = null)
+        public bool get_analog_input(int nb, Ice.Current current__ = null)
         {
             throw new NotImplementedException();
         }
 
-        public void setTool(int tool, Ice.Current current__ = null)
+        public void set_tool(int tool, Ice.Current current__ = null)
         {
             throw new NotImplementedException();
         }
 
-        public void setTCP(double[] tcp, Ice.Current current__ = null)
+        public void set_tcp(double[] tcp, Ice.Current current__ = null)
         {
             throw new NotImplementedException();
         }
 
         public void grasp(Ice.Current current__)
         {
-            setDigitalOut(1, true);
+            set_digital_out(1, true);
         }
 
         public void release(Ice.Current current__)
         {
-            setDigitalOut(1, false);
+            set_digital_out(1, false);
         }
 
 

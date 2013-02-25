@@ -28,10 +28,6 @@ module hms {
 
 	};
 
-	interface Signal extends GenericEventInterface {
-		void newBooleanSignal(string name, bool val);
-		void newComponentSignal(string Name, Component* comp);
-	};
 
 	interface Robot extends GenericRobot, Component {
         

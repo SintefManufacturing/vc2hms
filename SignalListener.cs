@@ -9,7 +9,7 @@ namespace vc2ice
         IvcPropertyList2 m_Signal;
         String m_ComponentName;
         String m_Type;
-        hms.SignalPrx m_pub;
+        hms.MessageInterfacePrx m_pub;
         icehms.IceApp IceApp;
         List<VCComponent> CompList;
 
@@ -24,7 +24,7 @@ namespace vc2ice
             CompList = new List<VCComponent>();
             //Console.WriteLine("Signal type is: " + m_Type);
 
-            m_pub = hms.SignalPrxHelper.uncheckedCast(iceapp.getEventPublisher(getID()));
+            m_pub = hms.MessageInterfacePrxHelper.uncheckedCast(iceapp.getEventPublisher(getID()));
             IvcEventPropertyListener l_Listener = this;
             eprop.addListener(this);
         }
@@ -120,7 +120,7 @@ namespace vc2ice
                         hms.Message msg = createMessage();
                         msg.arguments.Add("ComponentName", dname);
                         msg.arguments.Add("WorldPositionMatrix", Helpers.formatMatrix(comp.RootNode.getProperty("WorldPositionMatrix")));
-                        m_pub.putMessage(msg);
+                        m_pub.put_message(msg);
                     }
 
                 }
@@ -131,7 +131,7 @@ namespace vc2ice
                 //m_pub.newBooleanSignal(m_Signal.getProperty("Name"), Property.ExtendedValue);
                 //Now send a message
                 hms.Message msg = createMessage();
-                m_pub.putMessage(msg);
+                m_pub.put_message(msg);
             }
 
         }
