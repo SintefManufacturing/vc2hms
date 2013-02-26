@@ -146,6 +146,41 @@ namespace vc2ice
             }
         }
 
+        public override void put_message(hms.Message message, Ice.Current current)
+        {
+            string type;
+            string name;
+            string val;
+            try {
+                type = message.arguments["SignalType"];
+                name = message.arguments["SignalName"];
+                val = message.arguments["SignalValue"];
+            } catch (Exception e) {
+                log("Error got bad message: " + message.ToString() + "\n Exception: " + e);
+                return;
+            }
+            switch (type)
+            {
+                case "BooleanSignal":
+                    object[] behavs = Component.findBehavioursOfType("BooleanSignal");
+                    foreach (IvcBehaviour2 behav in behavs)
+                    {
+                        if (behav.getProperty("Name") == name)
+                        {
+                            ((IvcSignal)behav).setProperty("Value", Convert.ToBoolean(val));
+                            return;
+                        }
+                    }
+                    log(String.Format("Component {0} does not have a signal of name: {1}", this.Name, name));
+                    break;
+                case "ComponentSignal":
+                    break;
+                default:
+                    log("Unimplemented type: " + type);
+                    break;
+            }
+        }
+
         public string[] getBehaviourList(Ice.Current current__)
         {
             string[] result = new string[Component.RootNode.BehaviourCount];

@@ -83,7 +83,7 @@ namespace vc2ice
 
         }
         */
-        public hms.Message createMessage()
+        public hms.Message createMessage(string Value)
         {
             hms.Message msg = new hms.Message();
             msg.sender = getID();
@@ -91,6 +91,8 @@ namespace vc2ice
             msg.arguments.Add("EmitorName", m_ComponentName);
             msg.arguments.Add("SignalName", m_Type);
             msg.arguments.Add("SignalType", m_Type);
+            msg.arguments.Add("SignalValue", Value);
+
             return msg;
         }
 
@@ -117,7 +119,7 @@ namespace vc2ice
                         //m_pub.newComponentSignal(m_Signal.getProperty("Name"), hms.ComponentPrxHelper.uncheckedCast(prx));
                         //Now send a message
                         //Helpers.printMatrix("comp pose: ", comp.RootNode.getProperty("WorldPositionMatrix"));
-                        hms.Message msg = createMessage();
+                        hms.Message msg = createMessage(Value.ToString());
                         msg.arguments.Add("ComponentName", dname);
                         msg.arguments.Add("WorldPositionMatrix", Helpers.formatMatrix(comp.RootNode.getProperty("WorldPositionMatrix")));
                         m_pub.put_message(msg);
@@ -130,7 +132,7 @@ namespace vc2ice
                 //first resend signal to Ice
                 //m_pub.newBooleanSignal(m_Signal.getProperty("Name"), Property.ExtendedValue);
                 //Now send a message
-                hms.Message msg = createMessage();
+                hms.Message msg = createMessage(Value.ToString());
                 m_pub.put_message(msg);
             }
 
