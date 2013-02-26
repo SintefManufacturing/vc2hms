@@ -120,6 +120,7 @@ namespace vc2ice
             }
             deregisterSignals();
             base.shutdown();
+            _shutdown = true;
         }
 
         private void registerSignals()
