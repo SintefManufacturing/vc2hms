@@ -72,6 +72,7 @@ namespace vc2ice
 
         public void setupLinearMove(double[] pose, double vel)
         {
+            Console.WriteLine("Starting linear move to: " + Helpers.strMatrix(pose) +" with velocity: " + vel.ToString() + "m/s");
             Target.MotionType = 1; // 1 is Linear, 0 joint
             Target.CartesianSpeed = vel;
 
@@ -101,9 +102,11 @@ namespace vc2ice
 
         public void setupJointMove(double[] pose, double vel)
         {
+            Console.WriteLine("Starting joint move to: " + Helpers.strMatrix(pose) + " with velocity: " + vel.ToString() + "degree/s");
             Target.MotionType = 0; // 1 is Linear, 0 joint
             Target.TargetMode = 1; // robot base as reference
             Target.AngularSpeed = vel;
+            Target.JointSpeed = vel; // this should be % of max specified speed but something is broken
 
             double[] current = Target.RobotRootToRobotFlangeMatrix;
 
@@ -279,7 +282,7 @@ namespace vc2ice
             {
                 pose[i] = pose[i] * 180 / Math.PI;
             }
-            Helpers.printMatrix("New joint move command", pose);
+            //Helpers.printMatrix("New joint move command", pose);
             lock (this)
             {
                 CurrentMove = new Move(this, MoveType.Joint, pose, vel * 180 / Math.PI, acc * 180 / Math.PI);
@@ -344,7 +347,7 @@ namespace vc2ice
 
         public void movel(double[] pose, double acc = 0.01, double vel = 0.01, Ice.Current icecurrent = null)
         {
-            log("New move command: " + Helpers.strMatrix(pose));
+            //log("New move command: " + Helpers.strMatrix(pose));
             for (int i = 0; i < pose.Length; i++)
             {
                 pose[i] = pose[i] * 1000;
