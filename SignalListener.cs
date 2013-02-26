@@ -11,7 +11,6 @@ namespace vc2ice
         String m_Type;
         hms.MessageInterfacePrx m_pub;
         icehms.IceApp IceApp;
-        List<VCComponent> CompList;
 
 
         public SignalListener(string componentName, IvcPropertyList2 signal, icehms.IceApp iceapp)
@@ -21,7 +20,6 @@ namespace vc2ice
             m_Signal = signal;
             IvcEventProperty eprop = (IvcEventProperty)signal.getPropertyObject("Value");
             m_Type = m_Signal.getProperty("Type");
-            CompList = new List<VCComponent>();
             //Console.WriteLine("Signal type is: " + m_Type);
 
             m_pub = hms.MessageInterfacePrxHelper.uncheckedCast(iceapp.getEventPublisher(getID()));

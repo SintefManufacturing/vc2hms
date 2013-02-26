@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using vcCOM;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 
 namespace vc2ice
@@ -123,6 +125,7 @@ namespace vc2ice
             _shutdown = true;
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         private void registerSignals()
         {
             List<object> list = new List<object>();
@@ -132,13 +135,15 @@ namespace vc2ice
             list.AddRange(Component.findBehavioursOfType("StringSignal"));
             list.AddRange(Component.findBehavioursOfType("MatrixSignal"));
             list.AddRange(Component.findBehavioursOfType("RealSignal"));
-            foreach (object behav in list)
+            foreach (IvcPropertyList2 behav in list)
             {
-                SignalListener listen = new SignalListener(Name, (IvcPropertyList2)behav, IceApp);
+                //log(String.Format("Creating SignalListener {0} in component {1} ", behav.getProperty("Name"), this.Name));
+                SignalListener listen = new SignalListener(Name, behav, IceApp);
                 Signals.Add(listen);
             }
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         private void deregisterSignals()
         {
             foreach (SignalListener listen in Signals)

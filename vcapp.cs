@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using vcCOM;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace vc2ice
 {
@@ -55,13 +57,15 @@ namespace vc2ice
             createCurrentComponents();
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void shutdown()
         {
             Application.removeClient(this);
-            foreach (VCComponent comp in Components)
-            {
-                comp.shutdown();
-            }
+
+                foreach (VCComponent comp in Components)
+                {
+                    comp.shutdown();
+                }
             Holon.shutdown();
         }
 
@@ -102,17 +106,20 @@ namespace vc2ice
         }
         private bool isCreated(string name)
         {
-            foreach (VCComponent holon in Components)
-            {
-                if (holon.get_name() == name)
+
+                foreach (VCComponent holon in Components)
                 {
-                    return true;
+                    if (holon.get_name() == name)
+                    {
+                        return true;
+                    }
                 }
-            }
-            return false;
+                return false;
+
 
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void createCurrentComponents()
         {
             for (int i = 0; i < Application.ComponentCount; i++)
@@ -182,6 +189,7 @@ namespace vc2ice
 
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         private bool addComponent(IvcComponent comp, string name)
         {
             if (!isCreated(name))
@@ -202,6 +210,8 @@ namespace vc2ice
             else { return false; }
 
         }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void notifyWorld(ref IvcComponent comp, bool Added)
         {
             string name = (string)comp.getProperty("Name");
@@ -246,6 +256,7 @@ namespace vc2ice
             //throw new NotImplementedException();
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void notifyDynamicComponent(ref IvcComponent comp, ref IvcBehaviour Container, bool Added)
         {
             string cname = (string)comp.getProperty("Name");
