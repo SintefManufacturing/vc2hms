@@ -180,7 +180,7 @@ namespace VC2Ice
 
     public class VCRobot : VCComponent, hms.RobotOperations_, IvcExecutorClient
     {
-        public IvcRobot Controller;
+        public IvcRobot Controller{get; set;}
         private List<IvcEventProperty> Joints;
         private IvcApplication ivc;
         //private hms.RobotMotionCommandTie_ RobotServant;
@@ -192,13 +192,13 @@ namespace VC2Ice
         public hms.CSYS currentCSYS { get; set; }
 
 
-        public VCRobot(IvcApplication vc, icehms.IceApp app, IvcComponent robot, string name)
-            : base(app, robot, name, false)
+        public VCRobot(VCManager vcapp, IvcComponent robot, string name)
+            : base(vcapp, robot, name, false)
         {
             //we called base with activate=false so we need to create our own "tie servant"
             register((Ice.Object)new hms.RobotTie_(this));
             currentCSYS = hms.CSYS.World;
-            ivc = vc;
+            ivc = vcapp.IvcApp;
             object[] result = Component.findBehavioursOfType("RobotController");
             if (result.Length == 0)
             {

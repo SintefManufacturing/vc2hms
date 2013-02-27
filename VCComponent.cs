@@ -14,8 +14,8 @@ namespace VC2Ice
     {
         private IvcPropertyList2 PList;
 
-        public VCObject(icehms.IceApp iceapp, IvcPropertyList2 plist, string name)
-            : base(iceapp, name, false)
+        public VCObject(VCManager vcapp, IvcPropertyList2 plist, string name)
+            : base(vcapp.IceMgr, name, false)
         {
             PList = plist;
         }
@@ -41,8 +41,8 @@ namespace VC2Ice
             IvcProperty prop = PList.getPropertyObject(name);
             //Type tp = prop.GetType();
 
-            //       log("SETPROP: " + prop.getProperty("Type"));
-            //log("SETPROP: " + tp + prop + tp.ToString() + tp.MakeGenericType() ) ;
+            //       logger.Error("SETPROP: " + prop.getProperty("Type"));
+            //logger.Error("SETPROP: " + tp + prop + tp.ToString() + tp.MakeGenericType() ) ;
             //prop.Value =  Convert.ChangeType(val, (Type) prop.getProperty("Type")  );
             string stype = prop.getProperty("Type");
             switch (stype)
@@ -57,7 +57,7 @@ namespace VC2Ice
                     prop.Value = val;
                     break;
                 default:
-                    log("Uknown format for property: " + name + " and value: " + val + " of type: " + stype);
+                    logger.Error("Uknown format for property: " + name + " and value: " + val + " of type: " + stype);
                     break;
             }
 
@@ -73,7 +73,7 @@ namespace VC2Ice
     {
         private IvcBehaviour Behaviour;
 
-        public VCBehaviour(icehms.IceApp app, IvcBehaviour beha)
+        public VCBehaviour(VCManager app, IvcBehaviour beha)
             : base(app, (IvcPropertyList2)beha, (string)beha.getProperty("Name"))
         {
             Behaviour = beha;
@@ -85,14 +85,16 @@ namespace VC2Ice
 
     public class VCComponent : VCObject, hms.ComponentOperations_
     {
+        public VCManager VCMgr { get; set; }
         protected IvcComponent Component;
         private List<SignalListener> Signals;
         private List<VCBehaviour> Behaviours;
         private bool _shutdown = false;
 
-        public VCComponent(icehms.IceApp iceapp, IvcComponent comp, string name, bool activate = true, bool icegrid = true)
-            : base(iceapp, (IvcPropertyList2)comp, name)
+        public VCComponent(VCManager vcapp, IvcComponent comp, string name, bool activate = true, bool icegrid = true)
+            : base(vcapp, (IvcPropertyList2)comp, name)
         {
+            VCMgr = vcapp;
             Component = comp;
             Behaviours = new List<VCBehaviour>();
 
@@ -132,7 +134,7 @@ namespace VC2Ice
             list.AddRange(Component.findBehavioursOfType("RealSignal"));
             foreach (IvcPropertyList2 behav in list)
             {
-                //log(String.Format("Creating SignalListener {0} in component {1} ", behav.getProperty("Name"), this.Name));
+                //logger.Error(String.Format("Creating SignalListener {0} in component {1} ", behav.getProperty("Name"), this.Name));
                 SignalListener listen = new SignalListener(Name, behav, IceApp);
                 Signals.Add(listen);
             }
@@ -149,6 +151,57 @@ namespace VC2Ice
 
         public override void put_message(hms.Message message, Ice.Current current)
         {
+            string mtype;
+            try
+            {
+                mtype = message.arguments["MessageType"];
+            }
+            catch (KeyNotFoundException)
+            {
+                logger.Error("Error message misses MessageType key" + message.ToString());
+                return;
+            }
+            switch (mtype)
+            {
+                case "Signal":
+                    generateSignal(message);
+                    break;
+                case "Command":
+                    applyCommand(message);
+                    break;
+                default:
+                    logger.Error("Unimplemented message type: " + mtype);
+                    break;
+            }
+        }
+
+        private void applyCommand(hms.Message message)
+        {
+            string command;
+            try
+            {
+                command = message.arguments["Command"];
+            }
+            catch (KeyNotFoundException)
+            {
+                logger.Error("Error command message misses expected key: Command" + message.ToString());
+                return;
+            }
+            if (command == "StopMovement")
+            {
+                IvcCommand cmd = VCMgr.IvcApp.getCommand("StopMovement");
+                cmd.setProperty("Component", Component);
+                cmd.execute();
+            }
+            else
+            {
+                logger.Error(String.Format("Command {0} not implemented", command));
+            }
+
+        }
+
+        private void generateSignal(hms.Message message)
+        {
             string type;
             string name;
             string val;
@@ -160,29 +213,58 @@ namespace VC2Ice
             }
             catch (KeyNotFoundException e)
             {
-                log("Error message misses expected key: " + message.ToString() + "\n Exception: " + e);
+                logger.Error("Error message misses expected key: " + message.ToString() + "\n Exception: " + e);
                 return;
             }
+            IvcSignal signal;
             switch (type)
             {
                 case "BooleanSignal":
-                    object[] behavs = Component.findBehavioursOfType("BooleanSignal");
-                    foreach (IvcBehaviour2 behav in behavs)
+                    signal = getSignal(type, name);
+                    if (signal != null)
                     {
-                        if (behav.getProperty("Name") == name)
-                        {
-                            ((IvcSignal)behav).setProperty("Value", Convert.ToBoolean(val));
-                            return;
-                        }
+                        signal.setProperty("Value", Convert.ToBoolean(val));
                     }
-                    log(String.Format("Component {0} does not have a signal of name: {1}", this.Name, name));
                     break;
-                case "ComponentSignal":
+                case "StringSignal":
+                    signal = getSignal(type, name);
+                    if (signal != null)
+                    {
+                        signal.setProperty("Value", val);
+                    }
+                    break;
+                case "IntegerSignal":
+                    signal = getSignal(type, name);
+                    if (signal != null)
+                    {
+                        signal.setProperty("Value", Convert.ToInt64(val));
+                    }
+                    break;
+                case "RealSignal":
+                    signal = getSignal(type, name);
+                    if (signal != null)
+                    {
+                        signal.setProperty("Value", Convert.ToDouble(val));
+                    }
                     break;
                 default:
-                    log("Unimplemented type: " + type);
+                    logger.Error("Unimplemented type: " + type);
                     break;
             }
+        }
+
+        private IvcSignal getSignal(string signalType, string name)
+        {
+            object[] behavs = Component.findBehavioursOfType(signalType);
+            foreach (IvcBehaviour2 behav in behavs)
+            {
+                if (behav.getProperty("Name") == name)
+                {
+                    return (IvcSignal)behav;
+                }
+            }
+            logger.Error(String.Format("Component {0} does not have a signal of name: {1}", this.Name, name));
+            return null;
         }
 
         public string[] getBehaviourList(Ice.Current current__)
@@ -198,7 +280,7 @@ namespace VC2Ice
 
         public hms.BehaviourPrx getBehaviour(string name, Ice.Current current__)
         {
-            VCBehaviour tmp = new VCBehaviour(IceApp, Component.findBehaviour(name));
+            VCBehaviour tmp = new VCBehaviour(VCMgr, Component.findBehaviour(name));
             Behaviours.Add(tmp);
             return hms.BehaviourPrxHelper.checkedCast(tmp.Proxy);
         }

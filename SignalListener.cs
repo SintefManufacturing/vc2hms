@@ -10,13 +10,13 @@ namespace VC2Ice
         private String ComponentName;
         private String SignalType;
         private hms.MessageInterfacePrx Publisher;
-        private icehms.IceApp iceapp;
+        private icehms.IceManager iceapp;
         private string PublisherName;
         private string SignalName;
         log4net.ILog logger;
 
 
-        public SignalListener(string componentName, IvcPropertyList2 signal, icehms.IceApp iceapp)
+        public SignalListener(string componentName, IvcPropertyList2 signal, icehms.IceManager iceapp)
         {
             this.iceapp = iceapp;
             ComponentName = componentName;
@@ -83,7 +83,6 @@ namespace VC2Ice
                         msg.arguments.Add("WorldPositionMatrix", Helpers.formatMatrix(comp.RootNode.getProperty("WorldPositionMatrix")));
                         Publisher.put_message(msg);
                     }
-
                 }
             }
             else
