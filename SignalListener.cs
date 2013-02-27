@@ -12,6 +12,8 @@ namespace VC2Ice
         private hms.MessageInterfacePrx Publisher;
         private icehms.IceApp iceapp;
         private string PublisherName;
+        private string SignalName;
+        log4net.ILog logger;
 
 
         public SignalListener(string componentName, IvcPropertyList2 signal, icehms.IceApp iceapp)
@@ -19,10 +21,11 @@ namespace VC2Ice
             this.iceapp = iceapp;
             ComponentName = componentName;
             SignalProperties = signal;
+            logger = log4net.LogManager.GetLogger(this.GetType().Name);
             IvcEventProperty eprop = (IvcEventProperty)signal.getPropertyObject("Value");
             SignalType = SignalProperties.getProperty("Type");
-
-            PublisherName = ComponentName + "::" + (string)SignalProperties.getProperty("Name");
+            SignalName = (string)SignalProperties.getProperty("Name");
+            PublisherName = ComponentName + "::" + SignalName;
 
             Publisher = hms.MessageInterfacePrxHelper.uncheckedCast(iceapp.getEventPublisher(PublisherName));
             eprop.addListener(this);
@@ -37,9 +40,6 @@ namespace VC2Ice
             }         
         }
 
- 
-
-
         public void notifySetupChanged(ref IvcProperty Property)
         {
         }
@@ -49,7 +49,7 @@ namespace VC2Ice
             hms.Message msg = new hms.Message();
             msg.sender = ComponentName;
             msg.arguments = new System.Collections.Generic.Dictionary<string, string>();
-            msg.arguments.Add("SignalName", SignalType);
+            msg.arguments.Add("SignalName", SignalName);
             msg.arguments.Add("SignalType", SignalType);
             msg.arguments.Add("SignalValue", Value);
             return msg;
@@ -57,7 +57,7 @@ namespace VC2Ice
 
         public void notifyValueChanged(ref IvcProperty Property, object Value)
         {
-            Console.WriteLine(String.Format(" {0} generated signal of type {1} and value {2}", ComponentName, Value.GetType(), Value)); 
+            logger.Info(String.Format(" {0} generated signal {3} of type {1} and value {2}", ComponentName, Value.GetType(), Value, SignalName)); 
             if (SignalType == "ComponentSignal")
             {
                 IvcComponent comp = (IvcComponent)Property.ExtendedValue;

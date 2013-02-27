@@ -90,7 +90,6 @@ namespace VC2Ice
         private List<VCBehaviour> Behaviours;
         private bool _shutdown = false;
 
-
         public VCComponent(icehms.IceApp iceapp, IvcComponent comp, string name, bool activate = true, bool icegrid = true)
             : base(iceapp, (IvcPropertyList2)comp, name)
         {
@@ -201,8 +200,6 @@ namespace VC2Ice
         {
             VCBehaviour tmp = new VCBehaviour(IceApp, Component.findBehaviour(name));
             Behaviours.Add(tmp);
-            Console.WriteLine(tmp);
-            //return (hms.Behaviour) tmp;
             return hms.BehaviourPrxHelper.checkedCast(tmp.Proxy);
         }
     }

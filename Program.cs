@@ -9,6 +9,8 @@ namespace VC2Ice
         //[STAThread]
         static void Main(string[] args)
         {
+            log4net.Config.XmlConfigurator.Configure();
+            log4net.ILog log = log4net.LogManager.GetLogger(typeof(Program));
             icehms.IceApp iceapp = null;
             VCApp vcapp = null;
             string host = "Localhost";
@@ -23,6 +25,7 @@ namespace VC2Ice
                 host = args[0];
                 port = Convert.ToInt16(args[1]);
             }
+            log.Info(String.Format("Using {0}:{1} as IceHMS discovery server", host, port.ToString()));
             try
             {
                 iceapp = new IceApp("VC2IceAdapter", host, port, false);
@@ -32,7 +35,7 @@ namespace VC2Ice
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                log.Fatal(ex);
             }
             finally
             {

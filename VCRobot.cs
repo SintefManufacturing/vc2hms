@@ -52,6 +52,7 @@ namespace VC2Ice
         IvcMotionTarget Target;
         private VCRobot Robot;
         private IvcApplication ivc;
+        log4net.ILog logger;
 
         double StartTime;
         double EndTime;
@@ -60,6 +61,7 @@ namespace VC2Ice
         {
             this.ivc = ivc;
             Robot = robot;
+            logger = log4net.LogManager.GetLogger(robot.get_name() + "::" + this.GetType().Name);
             Motion = Robot.Controller.createMotionInterpolator();
             Target = Robot.Controller.createTarget();
             Target.JointSpeed = 100; // % of max specified speed
@@ -75,10 +77,6 @@ namespace VC2Ice
             }
 
 
-            //Console.WriteLine("Is target reachable: " + Target.getConfigWarning(Motion.TargetCount - 1));
-            //Target.getConfigWarning(0);
-            //Target.getConfigWarning(1);
-
             if (Target.getConfigWarning(Motion.TargetCount - 1) == 1)
             {
                 throw (new UnreachableException("Target is not reachable"));
@@ -93,7 +91,7 @@ namespace VC2Ice
 
         public void setupLinearMove(double[] pose, double vel)
         {
-            Console.WriteLine("Starting linear move to: " + Helpers.strMatrix(pose) + " with velocity: " + vel.ToString() + "m/s");
+            logger.Info("Starting linear move to: " + Helpers.strMatrix(pose) + " with velocity: " + vel.ToString() + "m/s");
             Target.MotionType = 1; // 1 is Linear, 0 joint
             Target.CartesianSpeed = vel;
 
@@ -123,7 +121,7 @@ namespace VC2Ice
 
         public void setupJointMove(double[] pose, double vel)
         {
-            Console.WriteLine("Starting joint move to: " + Helpers.strMatrix(pose) + " with velocity: " + vel.ToString() + "degree/s");
+            logger.Info("Starting joint move to: " + Helpers.strMatrix(pose) + " with velocity: " + vel.ToString() + "degree/s");
             Target.MotionType = 0; // 1 is Linear, 0 joint
             Target.TargetMode = 1; // robot base as reference
             Target.AngularSpeed = vel;
@@ -389,7 +387,7 @@ namespace VC2Ice
 
         public void notifyBinaryInputValueChange(int Index, bool Value)
         {
-            log("Binary input: " + Index + " has been changed to: " + Value);
+            logger.Debug("Binary input: " + Index + " has been changed to: " + Value);
         }
 
         public void notifyIntegerInputValueChange(int Index, int Value)
@@ -479,6 +477,7 @@ namespace VC2Ice
 
         public void set_digital_out(int nb, bool val, Ice.Current current__ = null)
         {
+            logger.Info(String.Format("Set digital out {0} to {1}", nb, val));
             Executor.setBinaryOutput(0, nb, val);
             //IvcSignal sig =   DigitalOutput.getPortSignal(nb);
             //sig.setProperty("Value", val);

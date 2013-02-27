@@ -10,9 +10,11 @@ namespace VC2Ice
     {
         private VCApp vcapp;
 
+
         public VCAppHolon(VCApp vcapp, icehms.IceApp iceapp, IvcPropertyList2 plist)
             : base(iceapp, plist, "Simulation")
         {
+
             //we called base with activate=false so we need to create our own "tie servant"
             register((Ice.Object)new hms.SimulationTie_(this));
             this.vcapp = vcapp;
@@ -45,11 +47,13 @@ namespace VC2Ice
         private List<VCComponent> Components;
         private icehms.IceApp iceapp;
         private VCAppHolon Holon;
+        log4net.ILog logger;
 
 
         public VCApp(icehms.IceApp app)
         {
             iceapp = app;
+            logger = log4net.LogManager.GetLogger(this.GetType().Name);
             Components = new List<VCComponent>();
             ivc = (IvcApplication)new vc3DCreate.vcc3DCreate();
             Holon = new VCAppHolon(this, app, (IvcPropertyList2) ivc);
@@ -176,6 +180,7 @@ namespace VC2Ice
         [MethodImpl(MethodImplOptions.Synchronized)]
         private bool addComponent(IvcComponent comp, string name)
         {
+            logger.Info(String.Format("Adding component {0}", name));
             if (!isCreated(name))
             {
                 VCComponent mycomp;
@@ -191,7 +196,11 @@ namespace VC2Ice
                 Components.Add(mycomp);
                 return true;
             }
-            else { return false; }
+            else 
+            {
+                logger.Info(String.Format("Component {0} was allready created", name));
+                return false; 
+            }
 
         }
 
@@ -213,6 +222,7 @@ namespace VC2Ice
         }
         private void removeComponent(string name)
         {
+            logger.Info(String.Format("Removing component {0}", name));
             for (int i = 0; i < Components.Count; i++)
             {
                 VCComponent holon = Components[i];
