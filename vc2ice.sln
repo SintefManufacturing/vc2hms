@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vc2ice", "vc2ice.csproj", "{E27837F0-4DAC-4D74-9FE0-8AF81C1E41DB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VC2Ice", "VC2Ice.csproj", "{E27837F0-4DAC-4D74-9FE0-8AF81C1E41DB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IceHMS", "..\icehms\src\cs\IceHMS.csproj", "{D6D54312-5DCE-457B-A3F3-4EE407ABFD4C}"
 EndProject

@@ -2,19 +2,30 @@
 using icehms;
 using System.Threading;
 
-namespace vc2ice
+namespace VC2Ice
 {
     static class Program
     {
         //[STAThread]
-        static void Main()
+        static void Main(string[] args)
         {
             icehms.IceApp iceapp = null;
             VCApp vcapp = null;
+            string host = "Localhost";
+            int port = 12000;
+            if (args.Length == 1)
+            {
+                host = args[0];
+            }
+            else if (args.Length == 2)
+            {
+
+                host = args[0];
+                port = Convert.ToInt16(args[1]);
+            }
             try
             {
-                iceapp = new IceApp("VC2IceAdapter", "utgaard.sintef.no", 12000, false);
-                //iceapp = new IceApp("VC2IceAdapter", "192.168.1.15", 12000, false);
+                iceapp = new IceApp("VC2IceAdapter", host, port, false);
                 vcapp = new VCApp(iceapp);
                 Console.WriteLine("Press any key to exit");
                 Console.ReadLine();

@@ -4,14 +4,14 @@ using vcCOM;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace vc2ice
+namespace VC2Ice
 {
     public class VCAppHolon : VCObject, hms.SimulationOperations_
     {
-        public VCApp vcapp;
+        private VCApp vcapp;
 
-        public VCAppHolon(VCApp vcapp, icehms.IceApp iceapp)
-            : base(iceapp, (IvcPropertyList2)vcapp.Application, "Simulation")
+        public VCAppHolon(VCApp vcapp, icehms.IceApp iceapp, IvcPropertyList2 plist)
+            : base(iceapp, plist, "Simulation")
         {
             //we called base with activate=false so we need to create our own "tie servant"
             register((Ice.Object)new hms.SimulationTie_(this));
@@ -41,26 +41,26 @@ namespace vc2ice
 
     public class VCApp : IvcClient2
     {
-        public IvcApplication Application;
-        public List<VCComponent> Components;
-        private icehms.IceApp IceApp;
+        private IvcApplication ivc;
+        private List<VCComponent> Components;
+        private icehms.IceApp iceapp;
         private VCAppHolon Holon;
 
 
         public VCApp(icehms.IceApp app)
         {
-            IceApp = app;
+            iceapp = app;
             Components = new List<VCComponent>();
-            Application = (IvcApplication)new vc3DCreate.vcc3DCreate();
-            Holon = new VCAppHolon(this, app);
-            Application.addClient(this);
+            ivc = (IvcApplication)new vc3DCreate.vcc3DCreate();
+            Holon = new VCAppHolon(this, app, (IvcPropertyList2) ivc);
+            ivc.addClient(this);
             createCurrentComponents();
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void shutdown()
         {
-            Application.removeClient(this);
+            ivc.removeClient(this);
 
                 foreach (VCComponent comp in Components)
                 {
@@ -72,38 +72,27 @@ namespace vc2ice
 
         public void start_simulation()
         {
-            Application.setProperty("SimulationRunning", true);
+            ivc.setProperty("SimulationRunning", true);
         }
 
         public void stop_simulation()
         {
-            Application.setProperty("SimulationRunning", false);
+            ivc.setProperty("SimulationRunning", false);
         }
 
         public void reset_simulation()
         {
-            IvcCommand l_restart = Application.getCommand("resetSimulation");
+            IvcCommand l_restart = ivc.getCommand("resetSimulation");
             l_restart.start();
         }
 
         public bool isSimulationRunning()
         {
-            return Application.getProperty("SimulationRunning");
+            return ivc.getProperty("SimulationRunning");
         }
 
-        private bool isRobot(IvcComponent comp)
-        {
-            object[] result = comp.findBehavioursOfType("RobotController");
-            if (result.Length > 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
 
-        }
+
         private bool isCreated(string name)
         {
 
@@ -122,9 +111,9 @@ namespace vc2ice
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void createCurrentComponents()
         {
-            for (int i = 0; i < Application.ComponentCount; i++)
+            for (int i = 0; i < ivc.ComponentCount; i++)
             {
-                IvcComponent comp = Application.getComponent(i);
+                IvcComponent comp = ivc.getComponent(i);
                 addComponent(comp, (string)comp.getProperty("Name"));
             }
         }
@@ -183,11 +172,6 @@ namespace vc2ice
         }
 
 
-        private void createComponent(IvcComponent comp, string name)
-        {
-
-
-        }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         private bool addComponent(IvcComponent comp, string name)
@@ -195,14 +179,14 @@ namespace vc2ice
             if (!isCreated(name))
             {
                 VCComponent mycomp;
-                if (isRobot(comp))
+                if (VCRobot.isRobot(comp))
                 {
-                    VCRobot rob = new VCRobot(Application, IceApp, comp, name);
+                    VCRobot rob = new VCRobot(ivc, iceapp, comp, name);
                     mycomp = (VCComponent)rob;
                 }
                 else
                 {
-                    mycomp = new VCComponent(IceApp, comp, name);
+                    mycomp = new VCComponent(iceapp, comp, name);
                 }
                 Components.Add(mycomp);
                 return true;
@@ -223,11 +207,11 @@ namespace vc2ice
             }
             else
             {
-                removeComponent(comp, name);
+                removeComponent(name);
             }
 
         }
-        private void removeComponent(IvcComponent comp, string name)
+        private void removeComponent(string name)
         {
             for (int i = 0; i < Components.Count; i++)
             {
@@ -268,7 +252,7 @@ namespace vc2ice
                 addComponent(comp, cname);
             }
             else
-                removeComponent(comp, cname);
+                removeComponent(cname);
             {
             }
         }

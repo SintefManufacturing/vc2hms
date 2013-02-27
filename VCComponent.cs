@@ -7,20 +7,18 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 
 
-namespace vc2ice
+namespace VC2Ice
 {
 
     public class VCObject : icehms.Holon
     {
-        public IvcPropertyList2 PList;
+        private IvcPropertyList2 PList;
 
-
-        public VCObject(icehms.IceApp app, IvcPropertyList2 plist, string name)
-            : base(app, name, false)
+        public VCObject(icehms.IceApp iceapp, IvcPropertyList2 plist, string name)
+            : base(iceapp, name, false)
         {
             PList = plist;
         }
-
 
         public string getProperty(string name, Ice.Current current__)
         {
@@ -73,7 +71,7 @@ namespace vc2ice
 
     public class VCBehaviour : VCObject, hms.BehaviourOperations_
     {
-        public IvcBehaviour Behaviour;
+        private IvcBehaviour Behaviour;
 
         public VCBehaviour(icehms.IceApp app, IvcBehaviour beha)
             : base(app, (IvcPropertyList2)beha, (string)beha.getProperty("Name"))
@@ -81,22 +79,20 @@ namespace vc2ice
             Behaviour = beha;
             register((Ice.Object)new hms.BehaviourTie_(this), false);
         }
-
-
     }
 
 
 
     public class VCComponent : VCObject, hms.ComponentOperations_
     {
-        public IvcComponent Component;
-        public List<SignalListener> Signals;
-        public List<VCBehaviour> Behaviours;
+        protected IvcComponent Component;
+        private List<SignalListener> Signals;
+        private List<VCBehaviour> Behaviours;
         private bool _shutdown = false;
 
 
-        public VCComponent(icehms.IceApp app, IvcComponent comp, string name, bool activate = true, bool icegrid = true)
-            : base(app, (IvcPropertyList2)comp, name)
+        public VCComponent(icehms.IceApp iceapp, IvcComponent comp, string name, bool activate = true, bool icegrid = true)
+            : base(iceapp, (IvcPropertyList2)comp, name)
         {
             Component = comp;
             Behaviours = new List<VCBehaviour>();
@@ -157,12 +153,15 @@ namespace vc2ice
             string type;
             string name;
             string val;
-            try {
+            try
+            {
                 type = message.arguments["SignalType"];
                 name = message.arguments["SignalName"];
                 val = message.arguments["SignalValue"];
-            } catch (Exception e) {
-                log("Error got bad message: " + message.ToString() + "\n Exception: " + e);
+            }
+            catch (KeyNotFoundException e)
+            {
+                log("Error message misses expected key: " + message.ToString() + "\n Exception: " + e);
                 return;
             }
             switch (type)
@@ -196,7 +195,6 @@ namespace vc2ice
                 result[i] = b.getProperty("Name");
             }
             return result;
-
         }
 
         public hms.BehaviourPrx getBehaviour(string name, Ice.Current current__)
@@ -207,8 +205,5 @@ namespace vc2ice
             //return (hms.Behaviour) tmp;
             return hms.BehaviourPrxHelper.checkedCast(tmp.Proxy);
         }
-
-
     }
-
 }

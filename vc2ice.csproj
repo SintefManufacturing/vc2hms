@@ -8,8 +8,8 @@
     <ProjectGuid>{E27837F0-4DAC-4D74-9FE0-8AF81C1E41DB}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>vc2ice</RootNamespace>
-    <AssemblyName>vc2ice</AssemblyName>
+    <RootNamespace>VC2Ice</RootNamespace>
+    <AssemblyName>VC2Ice</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -49,7 +49,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>vc2ice.Program</StartupObject>
+    <StartupObject>VC2Ice.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Ice, Version=3.4.2.0, Culture=neutral, PublicKeyToken=cdd571ade22f2f16, processorArchitecture=MSIL">
@@ -186,7 +186,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties ZerocIce_Tie="True" ZerocIce_IncludePath="C:\Users\olrd\Documents\GitHub\icehms\slices|C:\Users\olrd\Documents\GitHub\vc2icehms" ZerocIce_Prefix="True" ZerocIce_OutputDir="." ZerocIce_Enabled="True" ZerocIce_VerboseLevel="2" />
+      <UserProperties ZerocIce_VerboseLevel="2" ZerocIce_Enabled="True" ZerocIce_OutputDir="." ZerocIce_Prefix="True" ZerocIce_IncludePath="C:\Users\olrd\Documents\GitHub\icehms\slices|C:\Users\olrd\Documents\GitHub\vc2icehms" ZerocIce_Tie="True" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

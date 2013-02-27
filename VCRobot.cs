@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using vcCOM;
 using vcCOMExecutor;
 
-namespace vc2ice
+namespace VC2Ice
 {
     [Serializable]
     public class UnreachableException : Exception
@@ -24,6 +24,25 @@ namespace vc2ice
             : base(errorMessage, innerEx) { }
     }
 
+    [Serializable]
+    public class NotRobotException : Exception
+    {
+        public string ErrorMessage
+        {
+            get
+            {
+                return base.Message.ToString();
+            }
+        }
+
+        public NotRobotException(string errorMessage)
+            : base(errorMessage) { }
+
+        public NotRobotException(string errorMessage, Exception innerEx)
+            : base(errorMessage, innerEx) { }
+    }
+
+
     public enum MoveType { Linear, Joint };
 
 
@@ -32,12 +51,14 @@ namespace vc2ice
         IvcMotionInterpolator Motion;
         IvcMotionTarget Target;
         private VCRobot Robot;
+        private IvcApplication ivc;
 
         double StartTime;
         double EndTime;
 
-        public Move(VCRobot robot, MoveType move, double[] pose, double vel, double acc)
+        public Move(IvcApplication ivc, VCRobot robot, MoveType move, double[] pose, double vel, double acc)
         {
+            this.ivc = ivc;
             Robot = robot;
             Motion = Robot.Controller.createMotionInterpolator();
             Target = Robot.Controller.createTarget();
@@ -66,13 +87,13 @@ namespace vc2ice
             double end = Motion.getCycleTimeAtTarget(Motion.TargetCount - 1);
             //Console.WriteLine("Starting move");
 
-            StartTime = Robot.App.getProperty("SimTime");
+            StartTime = ivc.getProperty("SimTime");
             EndTime = StartTime + end;
         }
 
         public void setupLinearMove(double[] pose, double vel)
         {
-            Console.WriteLine("Starting linear move to: " + Helpers.strMatrix(pose) +" with velocity: " + vel.ToString() + "m/s");
+            Console.WriteLine("Starting linear move to: " + Helpers.strMatrix(pose) + " with velocity: " + vel.ToString() + "m/s");
             Target.MotionType = 1; // 1 is Linear, 0 joint
             Target.CartesianSpeed = vel;
 
@@ -126,7 +147,7 @@ namespace vc2ice
 
         public bool isFinished()
         {
-            double t = Robot.App.getProperty("SimTime");
+            double t = ivc.getProperty("SimTime");
             if (t > EndTime)
             {
                 return true;
@@ -141,20 +162,13 @@ namespace vc2ice
         public double[] getPose()
         {
             double[] bjoints = new double[Robot.Controller.JointCount];
-            double now = Robot.App.getProperty("SimTime");
+            double now = ivc.getProperty("SimTime");
             if (now > EndTime)
             {
                 now = EndTime;
             }
             now = now - StartTime;
-            try
-            {
-                Motion.interpolate(now, ref Target);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Interpolation error: " + ex);
-            }
+            Motion.interpolate(now, ref Target);
             for (int i = 0; i < Target.RobotJointCount; i++)
             {
                 bjoints[i] = Target.getJointValue(i);
@@ -170,14 +184,14 @@ namespace vc2ice
     {
         public IvcRobot Controller;
         private List<IvcEventProperty> Joints;
-        public IvcApplication App;
+        private IvcApplication ivc;
         //private hms.RobotMotionCommandTie_ RobotServant;
         //public override hms.HolonTie Servant { get; set; }
         private IvcExecutor Executor;
         private Move CurrentMove;
         private IvcSignalMap DigitalInput;
         private IvcSignalMap DigitalOutput;
-        public hms.CSYS currentCSYS = hms.CSYS.World;
+        public hms.CSYS currentCSYS { get; set; }
 
 
         public VCRobot(IvcApplication vc, icehms.IceApp app, IvcComponent robot, string name)
@@ -186,11 +200,11 @@ namespace vc2ice
             //we called base with activate=false so we need to create our own "tie servant"
             register((Ice.Object)new hms.RobotTie_(this));
             currentCSYS = hms.CSYS.World;
-            App = vc;
+            ivc = vc;
             object[] result = Component.findBehavioursOfType("RobotController");
             if (result.Length == 0)
             {
-                log("robot without controller found");
+                throw new NotRobotException(name + " does  not contain a RobotController behaviour");
             }
             else
             {
@@ -218,8 +232,19 @@ namespace vc2ice
             DigitalInput = (IvcSignalMap)Component.findBehaviour(pname);
             pname = ((IvcPropertyList)Executor).getProperty("DigitalMapOut");
             DigitalOutput = (IvcSignalMap)Component.findBehaviour(pname);
-            //log("nb ports output; " + DigitalOutput.getProperty("PortCount"));
-            //DigitalOutput.getPortSignal(2);
+        }
+
+        public static bool isRobot(IvcComponent comp)
+        {
+            object[] result = comp.findBehavioursOfType("RobotController");
+            if (result.Length > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public override void shutdown()
@@ -235,14 +260,14 @@ namespace vc2ice
             currentCSYS = csys;
         }
 
-        public List<string> getJoints()
+        public string[] getJoints()
         {
             List<string> list = new List<string>();
             foreach (IvcEventProperty j in Joints)
             {
                 list.Add(j.getProperty("Name"));
             }
-            return list;
+            return list.ToArray();
         }
 
         public double[] getj(Ice.Current current = null)
@@ -285,7 +310,7 @@ namespace vc2ice
             //Helpers.printMatrix("New joint move command", pose);
             lock (this)
             {
-                CurrentMove = new Move(this, MoveType.Joint, pose, vel * 180 / Math.PI, acc * 180 / Math.PI);
+                CurrentMove = new Move(ivc, this, MoveType.Joint, pose, vel * 180 / Math.PI, acc * 180 / Math.PI);
             }
             while (is_program_running() == true && !isShutdown())
             {
@@ -354,7 +379,7 @@ namespace vc2ice
             }
             lock (this)
             {
-                CurrentMove = new Move(this, MoveType.Linear, pose, vel * 1000, acc * 1000);
+                CurrentMove = new Move(ivc, this, MoveType.Linear, pose, vel * 1000, acc * 1000);
             }
             while (is_program_running() == true && !isShutdown())
             {

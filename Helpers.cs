@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace vc2ice
+namespace VC2Ice
 {
     public static class Helpers
     {
