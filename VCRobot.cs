@@ -3,6 +3,7 @@ using System.Threading;
 using System.Collections.Generic;
 using vcCOM;
 using vcCOMExecutor;
+using vcCOMsimulate;
 
 namespace VC2Ice
 {
@@ -63,7 +64,7 @@ namespace VC2Ice
             Robot = robot;
             logger = log4net.LogManager.GetLogger(robot.get_name() + "::" + this.GetType().Name);
             Motion = Robot.Controller.createMotionInterpolator();
-            Target = Robot.Controller.createTarget();
+            Target =  Robot.Controller.createTarget();
             Target.JointSpeed = 100; // % of max specified speed
 
 
@@ -167,10 +168,13 @@ namespace VC2Ice
             }
             now = now - StartTime;
             Motion.interpolate(now, ref Target);
+            bjoints = ((IvcMotionTarget4)Target ).GetAllJointValues();
+            /*
             for (int i = 0; i < Target.RobotJointCount; i++)
             {
                 bjoints[i] = Target.getJointValue(i);
             }
+             * */
             //Helpers.printMatrix("Interpolated joint pose is: ", bjoints);
             return bjoints;
         }
