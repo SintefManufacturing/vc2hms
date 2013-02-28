@@ -25,17 +25,17 @@ namespace VC2Ice
                 host = args[0];
                 port = Convert.ToInt16(args[1]);
             }
-            log.Info(String.Format("Using {0}:{1} as IceHMS discovery server", host, port.ToString()));
+            Console.WriteLine(String.Format("Using {0}:{1} as IceHMS discovery server", host, port.ToString()));
             try
             {
                 iceapp = new IceManager("VC2IceAdapter", host, port, false);
                 vcapp = new VCManager(iceapp);
-                Console.WriteLine("Press any key to exit");
+                Console.WriteLine("VC2IceHMS running, press any key to exit");
                 Console.ReadLine();
             }
             catch (Exception ex)
             {
-                log.Fatal(ex);
+                log.Fatal( ex.Message + ": Could not start IceHMS, are the IceHMS servers running?"); //ex);
             }
             finally
             {

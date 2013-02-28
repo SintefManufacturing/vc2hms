@@ -8,7 +8,7 @@ namespace VC2Ice
 {
     public class VCAppHolon : VCObject, hms.SimulationOperations_
     {
-        private VCManager vcapp;
+        private VCManager VCMgr;
 
 
         public VCAppHolon(VCManager vcapp, icehms.IceManager iceapp, IvcPropertyList2 plist)
@@ -17,26 +17,26 @@ namespace VC2Ice
 
             //we called base with activate=false so we need to create our own "tie servant"
             register((Ice.Object)new hms.SimulationTie_(this));
-            this.vcapp = vcapp;
+            this.VCMgr = vcapp;
         }
 
         public void start(Ice.Current current__)
         {
-            vcapp.start_simulation();
+            VCMgr.start_simulation();
         }
 
         public void stop(Ice.Current current__)
         {
-            vcapp.stop_simulation();
+            VCMgr.stop_simulation();
         }
 
         public void reset(Ice.Current current__)
         {
-            vcapp.reset_simulation();
+            VCMgr.reset_simulation();
         }
         public bool isSimulationRunning(Ice.Current current__)
         {
-            return vcapp.isSimulationRunning();
+            return VCMgr.isSimulationRunning();
         }
 
     }
@@ -59,6 +59,17 @@ namespace VC2Ice
             Holon = new VCAppHolon(this, app, (IvcPropertyList2) IvcApp);
             IvcApp.addClient(this);
             createCurrentComponents();
+            //print_commands();
+        }
+
+        private void print_commands()
+        {
+            Console.WriteLine("Available IvcApp commands are: ");
+            for (int i=0; i < IvcApp.CommandCount; i++)
+            {
+                Console.WriteLine(IvcApp.getCommandName(i));
+            }
+            Console.WriteLine();
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]

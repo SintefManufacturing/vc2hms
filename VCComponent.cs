@@ -177,19 +177,20 @@ namespace VC2Ice
 
         private void applyCommand(hms.Message message)
         {
+            /*
             string command;
             try
             {
                 command = message.arguments["Command"];
             }
-            catch (KeyNotFoundException)
+            catch (KeyNotFoundException e)
             {
                 logger.Error("Error command message misses expected key: Command" + message.ToString());
                 return;
             }
-            if (command == "StopMovement")
+            try
             {
-                IvcCommand cmd = VCMgr.IvcApp.getCommand("StopMovement");
+                IvcCommand cmd = VCMgr.IvcApp.getCommand(command);
                 cmd.setProperty("Component", Component);
                 cmd.execute();
             }
@@ -197,7 +198,8 @@ namespace VC2Ice
             {
                 logger.Error(String.Format("Command {0} not implemented", command));
             }
-
+             */
+            logger.Warn("Command messages are not implemeted yet");
         }
 
         private void generateSignal(hms.Message message)
@@ -213,7 +215,7 @@ namespace VC2Ice
             }
             catch (KeyNotFoundException e)
             {
-                logger.Error("Error message misses expected key: " + message.ToString() + "\n Exception: " + e);
+                logger.Error("Error message misses expected key: " + message.ToString() + "\n Exception: " + e.Message);
                 return;
             }
             IvcSignal signal;
@@ -260,6 +262,7 @@ namespace VC2Ice
             {
                 if (behav.getProperty("Name") == name)
                 {
+                    logger.Info(String .Format("Generating signal {0} of type {1} in component {2}", name, signalType, Name));
                     return (IvcSignal)behav;
                 }
             }
