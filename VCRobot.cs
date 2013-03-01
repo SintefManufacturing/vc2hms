@@ -5,7 +5,7 @@ using vcCOM;
 using vcCOMExecutor;
 using vcCOMsimulate;
 
-namespace VC2Ice
+namespace VC2HMS
 {
     [Serializable]
     public class UnreachableException : Exception
@@ -64,7 +64,7 @@ namespace VC2Ice
             Robot = robot;
             logger = log4net.LogManager.GetLogger(robot.get_name() + "::" + this.GetType().Name);
             Motion = Robot.Controller.createMotionInterpolator();
-            Target =  Robot.Controller.createTarget();
+            Target = Robot.Controller.createTarget();
             Target.JointSpeed = 100; // % of max specified speed
 
 
@@ -140,7 +140,7 @@ namespace VC2Ice
             {
                 Target.setJointValue(i, pose[i]);
             }
-            Motion.addTarget(ref  Target);
+            Motion.addTarget(ref Target);
         }
 
 
@@ -216,7 +216,6 @@ namespace VC2Ice
                 Joints = new List<IvcEventProperty>();
                 for (int k = 0; k < Controller.JointCount; k++)
                 {
-
                     string jointname = (string)Controller.getJoint(k).getProperty("Name");
                     IvcEventProperty joint = (IvcEventProperty)compprops.getPropertyObject(jointname);
                     Joints.Add(joint);

@@ -4,7 +4,7 @@ using vcCOM;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace VC2Ice
+namespace VC2HMS
 {
     public class VCAppHolon : VCObject, hms.SimulationOperations_
     {
@@ -14,7 +14,6 @@ namespace VC2Ice
         public VCAppHolon(VCManager vcapp, icehms.IceManager iceapp, IvcPropertyList2 plist)
             : base(vcapp, plist, "Simulation")
         {
-
             //we called base with activate=false so we need to create our own "tie servant"
             register((Ice.Object)new hms.SimulationTie_(this));
             this.VCMgr = vcapp;
@@ -65,7 +64,7 @@ namespace VC2Ice
         private void print_commands()
         {
             Console.WriteLine("Available IvcApp commands are: ");
-            for (int i=0; i < IvcApp.CommandCount; i++)
+            for (int i = 0; i < IvcApp.CommandCount; i++)
             {
                 Console.WriteLine(IvcApp.getCommandName(i));
             }
@@ -110,7 +109,6 @@ namespace VC2Ice
 
         private bool isCreated(string name)
         {
-
                 foreach (VCComponent holon in Components)
                 {
                     if (holon.get_name() == name)

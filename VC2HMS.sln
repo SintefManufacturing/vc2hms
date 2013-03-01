@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VC2Ice", "VC2Ice.csproj", "{E27837F0-4DAC-4D74-9FE0-8AF81C1E41DB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VC2HMS", "VC2HMS.csproj", "{E27837F0-4DAC-4D74-9FE0-8AF81C1E41DB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IceHMS", "..\icehms\src\cs\IceHMS.csproj", "{D6D54312-5DCE-457B-A3F3-4EE407ABFD4C}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "VC2HMS", "VC2HMSSetup\VC2HMSSetup.vdproj", "{F503423B-E195-4426-A099-C9309B8B9C18}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,6 +21,10 @@ Global
 		{D6D54312-5DCE-457B-A3F3-4EE407ABFD4C}.Debug|x86.Build.0 = Debug|x86
 		{D6D54312-5DCE-457B-A3F3-4EE407ABFD4C}.Release|x86.ActiveCfg = Release|x86
 		{D6D54312-5DCE-457B-A3F3-4EE407ABFD4C}.Release|x86.Build.0 = Release|x86
+		{F503423B-E195-4426-A099-C9309B8B9C18}.Debug|x86.ActiveCfg = Debug
+		{F503423B-E195-4426-A099-C9309B8B9C18}.Debug|x86.Build.0 = Debug
+		{F503423B-E195-4426-A099-C9309B8B9C18}.Release|x86.ActiveCfg = Release
+		{F503423B-E195-4426-A099-C9309B8B9C18}.Release|x86.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,9 +4,6 @@
 #include <hms.ice>
 
 module hms {
-
-
-
 	interface PropertyList {
 		string getProperty(string name);
 		StringSeq getPropertyList();

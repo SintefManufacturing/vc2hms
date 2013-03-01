@@ -2,11 +2,11 @@
 using icehms;
 using System.Threading;
 
-namespace VC2Ice
+namespace VC2HMS
 {
     static class Program
     {
-        //[STAThread]
+
         static void Main(string[] args)
         {
             log4net.Config.XmlConfigurator.Configure();
@@ -21,7 +21,6 @@ namespace VC2Ice
             }
             else if (args.Length == 2)
             {
-
                 host = args[0];
                 port = Convert.ToInt16(args[1]);
             }
@@ -35,7 +34,7 @@ namespace VC2Ice
             }
             catch (Exception ex)
             {
-                log.Fatal( ex.Message + ": Could not start IceHMS, are the IceHMS servers running?"); //ex);
+                log.Fatal( ex.Message + ": Could not start IceHMS, are the IceHMS servers running?"); 
             }
             finally
             {

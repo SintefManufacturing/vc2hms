@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace VC2Ice
+namespace VC2HMS
 {
     public static class Helpers
     {
         static public string strMatrix(double[] a)
         {
             string tmp = "{";
-            for (int i = 0; i < a.Length; i++) { tmp = tmp + a[i].ToString() + "  "; }
+            for (int i = 0; i < a.Length; i++) {
+                tmp = tmp + a[i].ToString() + "  "; 
+            }
             tmp += "}";
             return tmp;
         }
@@ -41,7 +43,5 @@ namespace VC2Ice
             }
             return s;
         }
-
-
     }
 }

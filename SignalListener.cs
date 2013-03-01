@@ -2,7 +2,7 @@
 using vcCOM;
 using System.Collections.Generic;
 
-namespace VC2Ice
+namespace VC2HMS
 {
     public class SignalListener : IvcEventPropertyListener
     {

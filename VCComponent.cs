@@ -7,9 +7,8 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 
 
-namespace VC2Ice
+namespace VC2HMS
 {
-
     public class VCObject : icehms.Holon
     {
         private IvcPropertyList2 PList;
