@@ -8,4 +8,12 @@ obj/*
 vc2ice.cs
 *.suo
 *.user
+*.cd
+vc2hms.cs
+extlib
+*.FxCop
+*.Cache
+*.StyleCop
+VC2HMSSetup/Debug
+VC2HMSSetup/Release
 
