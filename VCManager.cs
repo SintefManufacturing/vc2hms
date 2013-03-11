@@ -1,4 +1,21 @@
-﻿using System;
+﻿/*
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+
+using System;
 using System.Collections.Generic;
 using vcCOM;
 using System.Runtime.CompilerServices;
@@ -55,10 +72,15 @@ namespace VC2HMS
             logger = log4net.LogManager.GetLogger(this.GetType().Name);
             Components = new List<VCComponent>();
             IvcApp = (IvcApplication)new vc3DCreate.vcc3DCreate();
-            Holon = new VCAppHolon(this, app, (IvcPropertyList2) IvcApp);
+            Holon = new VCAppHolon(this, app, (IvcPropertyList2)IvcApp);
+
+            //print_commands();
+        }
+
+        public void start()
+        {
             IvcApp.addClient(this);
             createCurrentComponents();
-            //print_commands();
         }
 
         private void print_commands()
@@ -76,10 +98,10 @@ namespace VC2HMS
         {
             IvcApp.removeClient(this);
 
-                foreach (VCComponent comp in Components)
-                {
-                    comp.shutdown();
-                }
+            foreach (VCComponent comp in Components)
+            {
+                comp.shutdown();
+            }
             Holon.shutdown();
         }
 
@@ -109,14 +131,14 @@ namespace VC2HMS
 
         private bool isCreated(string name)
         {
-                foreach (VCComponent holon in Components)
+            foreach (VCComponent holon in Components)
+            {
+                if (holon.get_name() == name)
                 {
-                    if (holon.get_name() == name)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
-                return false;
+            }
+            return false;
 
 
         }
@@ -129,6 +151,7 @@ namespace VC2HMS
                 IvcComponent comp = IvcApp.getComponent(i);
                 addComponent(comp, (string)comp.getProperty("Name"));
             }
+            Console.WriteLine(String.Format("VC2HMS: {0} Component Holons created at Startup", IvcApp.ComponentCount));
         }
 
 
@@ -205,10 +228,10 @@ namespace VC2HMS
                 Components.Add(mycomp);
                 return true;
             }
-            else 
+            else
             {
                 logger.Info(String.Format("Component {0} was allready created", name));
-                return false; 
+                return false;
             }
 
         }

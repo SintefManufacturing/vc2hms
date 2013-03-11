@@ -30,7 +30,7 @@ class CellCtrl(Holon):
         conv = self._icemgr.get_holon("Sensor Conveyor")
         ur = self._icemgr.get_holon("UR10")
         init = [0.0, 0.0, 1.5707936732062238, 0, -1.57, 0.0]
-        if False:
+        if True:
             ur = self._icemgr.get_holon("KR 16-2")
             init = [0.0, -1.570795, 1.570795, 0.0, 1.57, 0.0]
         ur = ur.ice_timeout(100000)
@@ -68,5 +68,6 @@ class CellCtrl(Holon):
 
 
 if __name__ == "__main__":
+    import logging
     s = CellCtrl()
-    run_holon(s)
+    run_holon(s, logLevel=logging.DEBUG)
