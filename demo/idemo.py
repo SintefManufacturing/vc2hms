@@ -50,10 +50,21 @@ if __name__ == "__main__":
         else:
             print("found conv")
 
-        msg = icehms.Message()
-        msg.arguments["SignalType"] = "BooleanSignal"
-        msg.arguments["SignalValue"] = "False"
-        msg.arguments["SignalName"] = "StartStop"
+        convstopmsg = icehms.Message()
+        convstopmsg.arguments["MessageType"] = "Signal"
+        convstopmsg.arguments["SignalType"] = "BooleanSignal"
+        convstopmsg.arguments["SignalValue"] = "False"
+        convstopmsg.arguments["SignalName"] = "StartStop"
+
+        convstartmsg = icehms.Message()
+        convstartmsg.arguments["MessageType"] = "Signal"
+        convstartmsg.arguments["SignalType"] = "BooleanSignal"
+        convstartmsg.arguments["SignalValue"] = "True"
+        convstartmsg.arguments["SignalName"] = "StartStop"
+
+        compstopmsg = icehms.Message()
+        compstopmsg.arguments["MessageType"] = "Command"
+        compstopmsg.arguments["Command"] = "StopMovement"
 
         from IPython.frontend.terminal.embed import InteractiveShellEmbed
         ipshell = InteractiveShellEmbed( banner1="\nStarting IPython shell, available objects are:\n " + str(alive) + "\n")
