@@ -101,10 +101,10 @@ namespace VC2HMS
 
 
 
-    public class VCComponent : VCObject, hms.ComponentOperations_
+    public class VCComponent : VCObject, IvcComponentListener, hms.ComponentOperations_
     {
         public VCManager VCMgr { get; set; }
-        protected IvcComponent Component;
+        protected IvcComponent2 Component;
         private List<SignalListener> Signals;
         private List<VCBehaviour> Behaviours;
         private bool _shutdown = false;
@@ -113,7 +113,7 @@ namespace VC2HMS
             : base(vcapp, (IvcPropertyList2)comp, name)
         {
             VCMgr = vcapp;
-            Component = comp;
+            Component = (IvcComponent2) comp;
             Behaviours = new List<VCBehaviour>();
 
             if (activate)
@@ -122,6 +122,7 @@ namespace VC2HMS
             }
             Signals = new List<SignalListener>();
             registerSignals();
+            Component.addListener(this);
 
         }
         public bool isShutdown()
@@ -131,6 +132,7 @@ namespace VC2HMS
 
         public override void shutdown()
         {
+            Component.removeListener(this);
             foreach (VCBehaviour b in Behaviours)
             {
                 b.shutdown();
@@ -304,6 +306,49 @@ namespace VC2HMS
             VCBehaviour tmp = new VCBehaviour(VCMgr, Component.findBehaviour(name));
             Behaviours.Add(tmp);
             return hms.BehaviourPrxHelper.checkedCast(tmp.Proxy);
+        }
+
+        public void notifyChange(ref IvcComponent Component, string LinkName, ref IvcNode Link, int ChangeType, ref IvcNode Link2)
+        {
+            logger.Warn("NotifyChange: " + LinkName + " type: " + ChangeType + "link: " + Link.ToString());
+            
+            /*
+            switch (ChangeType)
+            {
+                case 0: //rebuild, this not change anything
+                    break; 
+                case 1: //modified. changes in a signal do not achange anything for us
+                    break;
+                case 2: //add
+                    this.Component.
+                    SignalListener listen = getListener(LinkName);
+                    if (listen != null)
+                    {
+                    }
+                    break;
+
+
+            }
+             * */
+        }
+
+        private SignalListener getListener(string name)
+        {
+             foreach (SignalListener listen in Signals)
+            {
+                if ( listen.getSignalName() == name ) {
+                    return listen;
+                }
+            }
+             return null;
+        }
+
+        public void notifyParentChange(ref IvcComponent Component, ref IvcNode Parent)
+        {
+        }
+
+        public void notifyPlugPlay(ref IvcComponent Component, ref IvcSimInterface ThisInterface, ref IvcSimInterface OtherInterface, bool Connected)
+        {
         }
     }
 }

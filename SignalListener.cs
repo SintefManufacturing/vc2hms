@@ -50,6 +50,26 @@ namespace VC2HMS
             eprop.addListener(this);
         }
 
+        public string getComponentName()
+        {
+            return this.ComponentName;
+        }
+
+        public string getSignalName()
+        {
+            return this.SignalName;
+        }
+
+        public string getSignalType()
+        {
+            return this.SignalType;
+        }
+        public string getPublisherName()
+        {
+            return this.PublisherName;
+        }
+
+
         public void shutdown()
         {
             IvcEventProperty l_EProp = (IvcEventProperty)SignalProperties.getPropertyObject("Value");
@@ -97,7 +117,7 @@ namespace VC2HMS
                         //m_pub.newComponentSignal(m_Signal.getProperty("Name"), hms.ComponentPrxHelper.uncheckedCast(prx));
                         //Now send a message
                         //Helpers.printMatrix("comp pose: ", comp.RootNode.getProperty("WorldPositionMatrix"));
-                        hms.Message msg = createMessage(Value.ToString());
+                        hms.Message msg = createMessage(dname);
                         msg.arguments.Add("ComponentName", dname);
                         msg.arguments.Add("WorldPositionMatrix", Helpers.formatMatrix(comp.RootNode.getProperty("WorldPositionMatrix")));
                         Publisher.put_message(msg);
