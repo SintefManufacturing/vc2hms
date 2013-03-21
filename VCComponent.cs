@@ -122,7 +122,7 @@ namespace VC2HMS
             }
             Signals = new List<SignalListener>();
             registerSignals();
-            Component.addListener(this);
+            //Component.addListener(this);
 
         }
         public bool isShutdown()
@@ -132,7 +132,7 @@ namespace VC2HMS
 
         public override void shutdown()
         {
-            Component.removeListener(this);
+            //Component.removeListener(this);
             foreach (VCBehaviour b in Behaviours)
             {
                 b.shutdown();
@@ -310,7 +310,7 @@ namespace VC2HMS
 
         public void notifyChange(ref IvcComponent Component, string LinkName, ref IvcNode Link, int ChangeType, ref IvcNode Link2)
         {
-            logger.Warn("NotifyChange: " + LinkName + " type: " + ChangeType + "link: " + Link.ToString());
+            logger.Warn("NotifyChange: " + LinkName + " type: " + ChangeType );
             
             /*
             switch (ChangeType)
