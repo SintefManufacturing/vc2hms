@@ -50,6 +50,11 @@ namespace VC2HMS
             eprop.addListener(this);
         }
 
+        public IvcPropertyList2 getPropertyListObject()
+        {
+            return SignalProperties;
+        }
+
         public string getComponentName()
         {
             return this.ComponentName;

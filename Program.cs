@@ -60,8 +60,8 @@ namespace VC2HMS
             {
                 iceapp = new IceManager("VC2IceAdapter", host, port, false);
                 vcapp = new VCManager(iceapp);
-                Console.WriteLine("VC2HMS running, press any key to exit");
                 vcapp.start();
+                Console.WriteLine("VC2HMS running, press any key to exit");
                 Console.ReadLine();
             }
             catch (Exception ex)

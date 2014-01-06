@@ -113,7 +113,7 @@ namespace VC2HMS
             : base(vcapp, (IvcPropertyList2)comp, name)
         {
             VCMgr = vcapp;
-            Component = (IvcComponent2) comp;
+            Component = (IvcComponent2)comp;
             Behaviours = new List<VCBehaviour>();
 
             if (activate)
@@ -121,7 +121,7 @@ namespace VC2HMS
                 register((Ice.Object)new hms.ComponentTie_(this), icegrid);
             }
             Signals = new List<SignalListener>();
-            registerSignals();
+            //registerSignals();
             //Component.addListener(this);
 
         }
@@ -152,13 +152,94 @@ namespace VC2HMS
             list.AddRange(Component.findBehavioursOfType("StringSignal"));
             list.AddRange(Component.findBehavioursOfType("MatrixSignal"));
             list.AddRange(Component.findBehavioursOfType("RealSignal"));
-            foreach (IvcPropertyList2 behav in list)
+            foreach (IvcPropertyList2 proplist in list)
             {
-                //logger.Error(String.Format("Creating SignalListener {0} in component {1} ", behav.getProperty("Name"), this.Name));
-                SignalListener listen = new SignalListener(Name, behav, IceApp);
+                SignalListener listen = new SignalListener(Name, proplist, IceApp);
                 Signals.Add(listen);
             }
         }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public void updateSignals()
+        {
+            //Since VC does not seems to provide callback for component change we need to check manually for component changes
+            List<object> toAdd = new List<object>();
+            List<object> toRemove = new List<object>();
+            List<object> list = new List<object>();
+            list.AddRange(Component.findBehavioursOfType("ComponentSignal"));
+            list.AddRange(Component.findBehavioursOfType("BooleanSignal"));
+            list.AddRange(Component.findBehavioursOfType("IntegerSignal"));
+            list.AddRange(Component.findBehavioursOfType("StringSignal"));
+            list.AddRange(Component.findBehavioursOfType("MatrixSignal"));
+            list.AddRange(Component.findBehavioursOfType("RealSignal"));
+            Boolean found = false;
+            foreach (IvcPropertyList2 proplist in list)
+            {
+                logger.Warn("Checking if Signal exist: " + proplist.getProperty("Name"));
+                foreach (SignalListener sigl in Signals)
+                {
+                    if (proplist.getProperty("Name") == sigl.getSignalName())
+                    {
+                        logger.Warn("yes it exists");
+                        if (sigl.getSignalType() != proplist.getProperty("Type"))
+                        {
+                            toRemove.Add(sigl);
+                            logger.Warn("Signal has changed " + proplist.getProperty("Name"));
+                        }
+                        found = true;
+                        break;
+                    }
+
+                }
+                if (found == true)
+                {
+                    found = false;
+                    continue;
+                }
+                else
+                {
+                    logger.Info("Signal is new: " + proplist.getProperty("Name"));
+                    toAdd.Add(proplist);
+                }
+            }
+
+
+            found = false;
+            foreach (SignalListener sigl in Signals)
+            {
+                foreach (IvcPropertyList2 proplist in list)
+                {
+                    if (proplist.getProperty("Name") == sigl.getSignalName())
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found == true)
+                {
+                    found = false;
+                    continue;
+                }
+                else
+                {
+                    logger.Info(String.Format("Signal {0} in component {1} has bee deleted: ", sigl.getSignalName(), sigl.getComponentName()));
+                    toRemove.Add(sigl);
+                }
+            }
+            foreach (SignalListener sigl in toRemove)
+            {
+                
+                sigl.shutdown();
+                Signals.Remove(sigl);
+            }
+            foreach (IvcPropertyList2 proplist in toAdd)
+            {
+                SignalListener listen = new SignalListener(Name, proplist, IceApp);
+                Signals.Add(listen);
+            }
+        }
+
+
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         private void deregisterSignals()
@@ -282,7 +363,7 @@ namespace VC2HMS
             {
                 if (behav.getProperty("Name") == name)
                 {
-                    logger.Info(String .Format("Generating signal {0} of type {1} in component {2}", name, signalType, Name));
+                    logger.Info(String.Format("Generating signal {0} of type {1} in component {2}", name, signalType, Name));
                     return (IvcSignal)behav;
                 }
             }
@@ -310,8 +391,8 @@ namespace VC2HMS
 
         public void notifyChange(ref IvcComponent Component, string LinkName, ref IvcNode Link, int ChangeType, ref IvcNode Link2)
         {
-            logger.Warn("NotifyChange: " + LinkName + " type: " + ChangeType );
-            
+            logger.Warn("NotifyChange: " + LinkName + " type: " + ChangeType);
+
             /*
             switch (ChangeType)
             {
@@ -334,13 +415,14 @@ namespace VC2HMS
 
         private SignalListener getListener(string name)
         {
-             foreach (SignalListener listen in Signals)
+            foreach (SignalListener listen in Signals)
             {
-                if ( listen.getSignalName() == name ) {
+                if (listen.getSignalName() == name)
+                {
                     return listen;
                 }
             }
-             return null;
+            return null;
         }
 
         public void notifyParentChange(ref IvcComponent Component, ref IvcNode Parent)

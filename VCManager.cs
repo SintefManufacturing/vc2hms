@@ -156,7 +156,13 @@ namespace VC2HMS
             Console.WriteLine(String.Format("VC2HMS: {0} Component Holons created at Startup", IvcApp.ComponentCount));
         }
 
+        public void updateComponents()
+        {
+            foreach ( VCComponent comp in Components ){
+                comp.updateSignals();
+            }
 
+        }
 
         #region IvcClient Members
 
@@ -167,8 +173,7 @@ namespace VC2HMS
 
         public void notifyApplication(bool AppReady)
         {
-            //throw new NotImplementedException();
-            //Console.WriteLine("NotifyApplication: ", Convert.ToString(AppReady));
+            logger.Info("NotifyApplication: " + AppReady);
         }
 
         public void notifyCommand(ref IvcCommand command, int State)
@@ -206,7 +211,11 @@ namespace VC2HMS
 
         public void notifySimulation(int State)
         {
-            // when simulation state changes
+            logger.Info("Simulation state changed to: " + State);
+            if (State == 0)
+            {
+                this.updateComponents();
+            }
         }
 
 
