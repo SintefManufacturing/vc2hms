@@ -6,7 +6,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{E27837F0-4DAC-4D74-9FE0-8AF81C1E41DB}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>VC2HMS</RootNamespace>
     <AssemblyName>VC2HMS</AssemblyName>
@@ -83,6 +83,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="vc2hms.cs" />
     <Compile Include="VCComponent.cs" />
     <Compile Include="VCManager.cs" />
@@ -91,6 +97,9 @@
     <Compile Include="VCRobot.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -210,7 +219,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties ZerocIce_Tie="True" ZerocIce_IncludePath="C:\Users\olrd\Documents\GitHub\icehms\slices|C:\Users\olrd\Documents\GitHub\vc2icehms" ZerocIce_Prefix="True" ZerocIce_OutputDir="." ZerocIce_Enabled="True" ZerocIce_VerboseLevel="2" />
+      <UserProperties ZerocIce_ProjectVersion="1" ZerocIce_VerboseLevel="2" ZerocIce_Enabled="True" ZerocIce_OutputDir="." ZerocIce_Prefix="True" ZerocIce_IncludePath="C:\Users\olrd\Documents\GitHub\icehms\slices|C:\Users\olrd\Documents\GitHub\vc2icehms" ZerocIce_Tie="True" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

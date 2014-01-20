@@ -66,6 +66,7 @@ namespace VC2HMS
         public icehms.IceManager IceMgr { get; set; }
         private VCAppHolon Holon;
         log4net.ILog logger;
+        private bool _shutdown = false;
 
 
         public VCManager(icehms.IceManager app)
@@ -95,9 +96,14 @@ namespace VC2HMS
             Console.WriteLine();
         }
 
+        public Boolean isShutdown(){
+            return _shutdown;
+        }
+
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void shutdown()
         {
+            _shutdown = true;
             IvcApp.removeClient(this);
 
             foreach (VCComponent comp in Components)
@@ -130,7 +136,7 @@ namespace VC2HMS
         }
 
 
-
+        [MethodImpl(MethodImplOptions.Synchronized)]
         private bool isCreated(string name)
         {
             foreach (VCComponent holon in Components)
@@ -156,10 +162,18 @@ namespace VC2HMS
             Console.WriteLine(String.Format("VC2HMS: {0} Component Holons created at Startup", IvcApp.ComponentCount));
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void updateComponents()
         {
             foreach ( VCComponent comp in Components ){
-                comp.updateSignals();
+                try
+                {
+                    comp.updateSignals();
+                }
+                catch (System.Exception ex)
+                {
+                    logger.Warn("Error updating signals for component: " + comp.get_name() + ex.ToString());
+                }
             }
 
         }
@@ -216,11 +230,11 @@ namespace VC2HMS
             {
                 this.updateComponents();
             }
+            logger.Info("All components updated");
         }
 
 
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         private bool addComponent(IvcComponent comp, string name)
         {
             logger.Info(String.Format("Adding component {0}", name));

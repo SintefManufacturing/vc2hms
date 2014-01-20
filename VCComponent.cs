@@ -130,6 +130,7 @@ namespace VC2HMS
             return _shutdown;
         }
 
+        
         public override void shutdown()
         {
             //Component.removeListener(this);
@@ -141,7 +142,7 @@ namespace VC2HMS
             base.shutdown();
             _shutdown = true;
         }
-
+        /*
         [MethodImpl(MethodImplOptions.Synchronized)]
         private void registerSignals()
         {
@@ -158,10 +159,12 @@ namespace VC2HMS
                 Signals.Add(listen);
             }
         }
+         */
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void updateSignals()
         {
+            logger.Warn("Update Signal list");
             //Since VC does not seems to provide callback for component change we need to check manually for component changes
             List<object> toAdd = new List<object>();
             List<object> toRemove = new List<object>();
@@ -175,16 +178,16 @@ namespace VC2HMS
             Boolean found = false;
             foreach (IvcPropertyList2 proplist in list)
             {
-                logger.Warn("Checking if Signal exist: " + proplist.getProperty("Name"));
+                //logger.Warn("Checking if Signal exist: " + proplist.getProperty("Name"));
                 foreach (SignalListener sigl in Signals)
                 {
                     if (proplist.getProperty("Name") == sigl.getSignalName())
                     {
-                        logger.Warn("yes it exists");
+                        //logger.Warn("yes it exists");
                         if (sigl.getSignalType() != proplist.getProperty("Type"))
                         {
                             toRemove.Add(sigl);
-                            logger.Warn("Signal has changed " + proplist.getProperty("Name"));
+                        //    logger.Warn("Signal has changed " + proplist.getProperty("Name"));
                         }
                         found = true;
                         break;

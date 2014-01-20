@@ -18,81 +18,25 @@
 
 
 using System;
-using icehms;
 using System.Threading;
-
+using System.Windows.Forms;
 namespace VC2HMS
 {
     static class Program
     {
-        public static icehms.IceManager iceapp = null;
-        public static VCManager vcapp = null;
 
-        static void Main(string[] args)
+        [STAThread]
+        static void Main()
         {
-            //Set up logging
-            log4net.Config.XmlConfigurator.Configure();
-            log4net.ILog log = log4net.LogManager.GetLogger(typeof(Program));
-            
-            //Parse command line
-            string host = "Localhost";
-            int port = 12000;
-            if (args.Length == 1)
-            {
-                host = args[0];
-            }
-            else if (args.Length == 2)
-            {
-                host = args[0];
-                port = Convert.ToInt16(args[1]);
-            }
-            Console.WriteLine(String.Format("Using {0}:{1} as IceHMS discovery server", host, port.ToString()));
 
-            //Now catch ctrl-c to shutdown properly
-            Console.CancelKeyPress += (sender, eventArgs) =>
-            {
-                Console.WriteLine("\nCancelEvent catched\n");
-                eventArgs.Cancel = true; //
-            };
 
-            //Create objects and start
-            try
-            {
-                iceapp = new IceManager("VC2IceAdapter", host, port, false);
-                vcapp = new VCManager(iceapp);
-                vcapp.start();
-                Console.WriteLine("VC2HMS running, press any key to exit");
-                Console.ReadLine();
-            }
-            catch (Exception ex)
-            {
-                log.Fatal(ex.Message + ": Could not start IceHMS, are the IceHMS servers running?");
-            }
-            finally
-            {
-                cleanup();
-            }
-            Console.WriteLine("Press any key to close window");
-            Console.ReadLine();
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new mainForm());
         }
 
-        static void cleanup()
-        {
-            Console.WriteLine("\nCleaning up\n");
-            try
-            {
-                if (vcapp != null)
-                {
-                    vcapp.shutdown();
-                }
-            }
-            finally
-            {
-                if (iceapp != null)
-                {
-                    iceapp.shutdown();
-                }
-            }
-        }
+
+
+ 
     }
 }
