@@ -159,7 +159,7 @@ namespace VC2HMS
                 IvcComponent comp = IvcApp.getComponent(i);
                 addComponent(comp, (string)comp.getProperty("Name"));
             }
-            Console.WriteLine(String.Format("VC2HMS: {0} Component Holons created at Startup", IvcApp.ComponentCount));
+            logger.Warn(String.Format("VC2HMS: {0} Component Holons created at Startup", IvcApp.ComponentCount));
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -193,7 +193,6 @@ namespace VC2HMS
         public void notifyCommand(ref IvcCommand command, int State)
         {
             // This method is called when a command is started or stopped.
-            //Console.WriteLine("NotifyCommand: ", Convert.ToString(command));
         }
 
         public void notifyProgress(double Progress)
@@ -214,7 +213,6 @@ namespace VC2HMS
             //   another selection type.
 
             //Invoke(new UIUpdate(driveRobot));
-            //Console.WriteLine("NotifySelction: ", Convert.ToString(Selection));
 
         }
 
@@ -265,7 +263,6 @@ namespace VC2HMS
         public void notifyWorld(ref IvcComponent comp, bool Added)
         {
             string name = (string)comp.getProperty("Name");
-            //Console.WriteLine("NotifyWorld says:    " + name + Added);
 
             if (Added)
             {
@@ -311,7 +308,6 @@ namespace VC2HMS
         public void notifyDynamicComponent(ref IvcComponent comp, ref IvcBehaviour Container, bool Added)
         {
             string cname = (string)comp.getProperty("Name");
-            //Console.WriteLine("Dynamic component: " + cname + Added);
             long sessionId = (long)comp.getProperty("SessionID");
             cname = cname + "-" + sessionId.ToString();
             //cname = "Dynamic-" + cname +  sessionId.ToString();

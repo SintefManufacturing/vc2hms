@@ -334,7 +334,6 @@ namespace VC2HMS
             }
             while (is_program_running() == true && !isShutdown())
             {
-                Console.WriteLine(is_program_running());
                 Thread.Sleep(50);
             }
         }
