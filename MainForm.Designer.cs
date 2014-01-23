@@ -34,15 +34,17 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.PortBox = new System.Windows.Forms.TextBox();
-            this.logBox = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.logBox = new System.Windows.Forms.ListBox();
+            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // StartButton
             // 
-            this.StartButton.Location = new System.Drawing.Point(12, 104);
+            this.StartButton.Location = new System.Drawing.Point(3, 63);
             this.StartButton.Name = "StartButton";
-            this.StartButton.Size = new System.Drawing.Size(75, 23);
+            this.StartButton.Size = new System.Drawing.Size(143, 24);
             this.StartButton.TabIndex = 0;
             this.StartButton.Text = "Start";
             this.StartButton.UseVisualStyleBackColor = true;
@@ -50,9 +52,9 @@
             // 
             // StopButton
             // 
-            this.StopButton.Location = new System.Drawing.Point(168, 104);
+            this.StopButton.Location = new System.Drawing.Point(152, 63);
             this.StopButton.Name = "StopButton";
-            this.StopButton.Size = new System.Drawing.Size(75, 23);
+            this.StopButton.Size = new System.Drawing.Size(143, 24);
             this.StopButton.TabIndex = 1;
             this.StopButton.Text = "Stop";
             this.StopButton.UseVisualStyleBackColor = true;
@@ -60,74 +62,118 @@
             // 
             // ServerBox
             // 
-            this.ServerBox.Location = new System.Drawing.Point(108, 28);
+            this.ServerBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel1.SetColumnSpan(this.ServerBox, 3);
+            this.ServerBox.Location = new System.Drawing.Point(152, 3);
             this.ServerBox.Name = "ServerBox";
-            this.ServerBox.Size = new System.Drawing.Size(120, 20);
+            this.ServerBox.Size = new System.Drawing.Size(442, 20);
             this.ServerBox.TabIndex = 2;
-            this.ServerBox.Text = "utgaard.sintef.no";
+            this.ServerBox.Text = "localhost";
+            this.ServerBox.TextChanged += new System.EventHandler(this.ServerBox_TextChanged);
             // 
             // label1
             // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(22, 28);
+            this.label1.Location = new System.Drawing.Point(3, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(80, 13);
+            this.label1.Size = new System.Drawing.Size(143, 30);
             this.label1.TabIndex = 3;
             this.label1.Text = "IceHMS Server";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // label2
             // 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(25, 68);
+            this.label2.Location = new System.Drawing.Point(3, 30);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(26, 13);
+            this.label2.Size = new System.Drawing.Size(143, 30);
             this.label2.TabIndex = 4;
             this.label2.Text = "Port";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // PortBox
             // 
-            this.PortBox.Location = new System.Drawing.Point(108, 61);
+            this.PortBox.Location = new System.Drawing.Point(152, 33);
             this.PortBox.Name = "PortBox";
-            this.PortBox.Size = new System.Drawing.Size(100, 20);
+            this.PortBox.Size = new System.Drawing.Size(143, 20);
             this.PortBox.TabIndex = 5;
             this.PortBox.Text = "12000";
             // 
-            // logBox
-            // 
-            this.logBox.Location = new System.Drawing.Point(12, 171);
-            this.logBox.Multiline = true;
-            this.logBox.Name = "logBox";
-            this.logBox.ReadOnly = true;
-            this.logBox.Size = new System.Drawing.Size(471, 400);
-            this.logBox.TabIndex = 6;
-            // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(386, 104);
+            this.button1.AutoSize = true;
+            this.button1.Location = new System.Drawing.Point(446, 63);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.Size = new System.Drawing.Size(144, 23);
             this.button1.TabIndex = 7;
             this.button1.Text = "Exit";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.AutoSize = true;
+            this.tableLayoutPanel1.ColumnCount = 4;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 24.97908F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 24.97908F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 24.43515F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25.6067F));
+            this.tableLayoutPanel1.Controls.Add(this.PortBox, 1, 1);
+            this.tableLayoutPanel1.Controls.Add(this.logBox, 1, 3);
+            this.tableLayoutPanel1.Controls.Add(this.StartButton, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.StopButton, 1, 2);
+            this.tableLayoutPanel1.Controls.Add(this.ServerBox, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.button1, 3, 2);
+            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.label2, 0, 1);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 3;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 0F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(597, 642);
+            this.tableLayoutPanel1.TabIndex = 9;
+            // 
+            // logBox
+            // 
+            this.logBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel1.SetColumnSpan(this.logBox, 4);
+            this.logBox.FormattingEnabled = true;
+            this.logBox.HorizontalScrollbar = true;
+            this.logBox.Location = new System.Drawing.Point(3, 93);
+            this.logBox.MinimumSize = new System.Drawing.Size(100, 100);
+            this.logBox.Name = "logBox";
+            this.logBox.ScrollAlwaysVisible = true;
+            this.logBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+            this.logBox.Size = new System.Drawing.Size(591, 537);
+            this.logBox.TabIndex = 8;
+            // 
             // mainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(495, 583);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.logBox);
-            this.Controls.Add(this.PortBox);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.ServerBox);
-            this.Controls.Add(this.StopButton);
-            this.Controls.Add(this.StartButton);
+            this.ClientSize = new System.Drawing.Size(597, 642);
+            this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "mainForm";
             this.Text = "VCHMS";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Cleanup);
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Load += new System.EventHandler(this.MainForm_Load);
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -141,7 +187,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox PortBox;
-        private System.Windows.Forms.TextBox logBox;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.ListBox logBox;
     }
 }

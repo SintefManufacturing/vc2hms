@@ -19,6 +19,7 @@ namespace VC2HMS
         public static icehms.IceManager iceapp = null;
         public static VCManager vcapp = null;
         private log4net.ILog log;
+        private int LogMaxSize = 5000;
         public mainForm()
         {
             InitializeComponent();
@@ -26,7 +27,6 @@ namespace VC2HMS
             log4net.Config.XmlConfigurator.Configure();
             log = log4net.LogManager.GetLogger(typeof(Program));
             ((log4net.Repository.Hierarchy.Hierarchy)log4net.LogManager.GetRepository()).Root.AddAppender(this);
-            StopButton.Enabled = false;
 
         }
 
@@ -101,9 +101,6 @@ namespace VC2HMS
             e.Cancel = false; // accept shutdown
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-        }
 
         private void StartButton_Click(object sender, EventArgs e)
         {
@@ -118,16 +115,38 @@ namespace VC2HMS
         public void DoAppend(log4net.Core.LoggingEvent loggingEvent)
         {
 
+
+
             String msg = String.Format("{0}  {1}: {2}", loggingEvent.LoggerName, loggingEvent.Level.Name, loggingEvent.MessageObject.ToString());
             //this.Invoke(logAppend, msg);
-            this.Invoke((MethodInvoker)delegate{ logBox.AppendText(msg + Environment.NewLine); });
+            this.Invoke((MethodInvoker)delegate{ 
+                logBox.Items.Insert(0, msg); 
+            while (logBox.Items.Count > LogMaxSize){
+                logBox.Items.RemoveAt(logBox.Items.Count - 1);
+            }
+            });
 
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             Stop();
+            Properties.Settings.Default["Server"] = ServerBox.Text;
+            Properties.Settings.Default.Save();
             this.Close();
+        }
+
+        private void ServerBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+
+
+            ServerBox.Text = Properties.Settings.Default["Server"].ToString();
+            StopButton.Enabled = false;    
         }
 
 
