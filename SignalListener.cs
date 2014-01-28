@@ -101,7 +101,11 @@ namespace VC2HMS
 
         public void notifyValueChanged(ref IvcProperty Property, object Value)
         {
-            if (Value == null) {
+            Type t = Value.GetType();
+            String val = Value.ToString();
+
+            if (val.IndexOf("Null", StringComparison.OrdinalIgnoreCase) > 0)
+            {
                 return;
             }
             logger.Warn(String.Format(" {0} generating signal {3} of type {1} and value {2}", ComponentName, Value.GetType(), Value, SignalName)); 
@@ -128,7 +132,7 @@ namespace VC2HMS
                         hms.Message msg = createMessage(dname);
                         msg.arguments.Add("ComponentName", dname);
                         msg.arguments.Add("WorldPositionMatrix", Helpers.formatMatrix(comp.RootNode.getProperty("WorldPositionMatrix")));
-                        Publisher.put_message(msg);
+                        Publisher.begin_put_message(msg);
                     }
                 }
             }
@@ -138,7 +142,7 @@ namespace VC2HMS
                 //m_pub.newBooleanSignal(m_Signal.getProperty("Name"), Property.ExtendedValue);
                 //Now send a message
                 hms.Message msg = createMessage(Value.ToString());
-                Publisher.put_message(msg);
+                Publisher.begin_put_message(msg);
             }
             logger.Warn(String.Format("Signal sent")); 
 

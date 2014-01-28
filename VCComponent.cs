@@ -19,15 +19,70 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Linq;
 using System.Text;
 using vcCOM;
 using System.Runtime.CompilerServices;
-using System.Threading;
 
 
 namespace VC2HMS
 {
+/*
+    public class Worker
+    {
+        private volatile bool _stopev = false;
+        public Thread WorkerThread;
+        ConcurrentQueue<object> Queue;
+        String Name;
+        protected log4net.ILog logger;
+
+
+        public Worker(String Name)
+ 
+        {
+            this.Name = Name;
+            WorkerThread = new Thread(run);
+            Queue = new ConcurrentQueue<object>();
+            logger = log4net.LogManager.GetLogger(this.GetType().Name + "::" + Name);
+        }
+
+        private void run() 
+        {
+            object msg = null;
+            while (!_stopev)
+            {
+
+                Queue.TryDequeue(out msg);
+                if (msg != null)
+                {
+                    logger.Warn("Thread got a message!");
+
+                }
+                else
+                {
+                    Thread.Sleep(10);
+                }
+
+
+
+            }
+        
+        }
+
+
+        public void stop()
+        {
+            _stopev = true;
+        }
+
+
+    }
+
+ */
+
     public class VCObject : icehms.Holon
     {
         private IvcPropertyList2 PList;
@@ -123,6 +178,7 @@ namespace VC2HMS
             Signals = new List<SignalListener>();
             //registerSignals();
             //Component.addListener(this);
+            this.updateSignals();
 
         }
         public bool isShutdown()
