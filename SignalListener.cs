@@ -101,7 +101,10 @@ namespace VC2HMS
 
         public void notifyValueChanged(ref IvcProperty Property, object Value)
         {
-            logger.Info(String.Format(" {0} generated signal {3} of type {1} and value {2}", ComponentName, Value.GetType(), Value, SignalName)); 
+            if (Value == null) {
+                return;
+            }
+            logger.Warn(String.Format(" {0} generating signal {3} of type {1} and value {2}", ComponentName, Value.GetType(), Value, SignalName)); 
             if (SignalType == "ComponentSignal")
             {
                 IvcComponent comp = (IvcComponent)Property.ExtendedValue;
@@ -137,6 +140,7 @@ namespace VC2HMS
                 hms.Message msg = createMessage(Value.ToString());
                 Publisher.put_message(msg);
             }
+            logger.Warn(String.Format("Signal sent")); 
 
         }
 

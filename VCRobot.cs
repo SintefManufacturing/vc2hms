@@ -96,12 +96,6 @@ namespace VC2HMS
                 setupJointMove(pose, vel);
             }
 
-
-            if (Target.getConfigWarning(Motion.TargetCount - 1) == 1)
-            {
-                throw (new UnreachableException("Target is not reachable"));
-            }
-
             double end = Motion.getCycleTimeAtTarget(Motion.TargetCount - 1);
             //Console.WriteLine("Starting move");
 
@@ -399,7 +393,15 @@ namespace VC2HMS
             }
             lock (this)
             {
-                CurrentMove = new Move(ivc, this, MoveType.Linear, pose, vel * 1000, acc * 1000);
+                try
+                {
+                    CurrentMove = new Move(ivc, this, MoveType.Linear, pose, vel * 1000, acc * 1000);
+                }
+                catch (UnreachableException ex)
+                {
+                    logger.Warn("Error target is not reachable!" + Helpers.formatMatrix(pose));
+                    return;
+                }
             }
             while (is_program_running() == true && !isShutdown())
             {

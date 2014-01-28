@@ -164,7 +164,7 @@ namespace VC2HMS
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void updateSignals()
         {
-            logger.Warn("Update Signal list");
+            logger.Info("Update Signal list");
             //Since VC does not seems to provide callback for component change we need to check manually for component changes
             List<object> toAdd = new List<object>();
             List<object> toRemove = new List<object>();
@@ -394,7 +394,7 @@ namespace VC2HMS
 
         public void notifyChange(ref IvcComponent Component, string LinkName, ref IvcNode Link, int ChangeType, ref IvcNode Link2)
         {
-            logger.Warn("NotifyChange: " + LinkName + " type: " + ChangeType);
+            logger.Info("NotifyChange: " + LinkName + " type: " + ChangeType);
 
             /*
             switch (ChangeType)

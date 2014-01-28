@@ -149,6 +149,11 @@ namespace VC2HMS
             StopButton.Enabled = false;    
         }
 
+        private void buttonClear_Click(object sender, EventArgs e)
+        {
+            logBox.Items.Clear();
+        }
+
 
 
 
