@@ -108,7 +108,14 @@ namespace VC2HMS
 
             foreach (VCComponent comp in Components)
             {
-                comp.shutdown();
+                try
+                {
+                    comp.shutdown();
+                }
+                catch (Ice.Exception ex)
+                {
+                    logger.Warn("Error shutting down component: " + comp.Name + ex);
+                }
             }
             Holon.shutdown();
         }
@@ -270,7 +277,13 @@ namespace VC2HMS
             }
             else
             {
-                removeComponent(name);
+                try
+                {
+                    removeComponent(name);
+                }
+                catch (Exception ex ) {
+                    logger.Warn("Error removing component: " + name + ex);
+                }
             }
 
         }
@@ -307,6 +320,7 @@ namespace VC2HMS
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void notifyDynamicComponent(ref IvcComponent comp, ref IvcBehaviour Container, bool Added)
         {
+            //FIXME: Could add a property to flag this component as dynamic eller just put it in a list
             string cname = (string)comp.getProperty("Name");
             long sessionId = (long)comp.getProperty("SessionID");
             cname = cname + "-" + sessionId.ToString();

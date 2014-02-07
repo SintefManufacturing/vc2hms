@@ -118,6 +118,21 @@ namespace VC2HMS
                     //find if holon exist for component
                     string name = comp.getProperty("Name");
                     string dname = name + comp.getProperty("SessionID"); //name for dynamic components
+                    hms.Message msg = createMessage(dname);
+                    msg.arguments.Add("ComponentName", name);
+                    msg.arguments.Add("DynamicComponentName", name);
+                    msg.arguments.Add("WorldPositionMatrix", Helpers.formatMatrix(comp.RootNode.getProperty("WorldPositionMatrix")));
+                    try
+                    {
+                        Publisher.begin_put_message(msg);
+                    }
+                    catch (Ice.Exception ex)
+                    {
+                        logger.Warn("Error publishing signal message" + SignalType + name + dname + ex);
+                    }
+                    
+                    
+                    /*
                     Ice.ObjectPrx prx = iceapp.getHolon(dname);
                     if (prx == null)
                     {
@@ -134,7 +149,10 @@ namespace VC2HMS
                         msg.arguments.Add("WorldPositionMatrix", Helpers.formatMatrix(comp.RootNode.getProperty("WorldPositionMatrix")));
                         Publisher.begin_put_message(msg);
                     }
+                    else { logger.Warn("Error could not get holon proxy for component" + name + " " + dname); }
+                     * */
                 }
+                else { logger.Warn("Error got component signal for non existing component"); }
             }
             else
             {
@@ -144,7 +162,7 @@ namespace VC2HMS
                 hms.Message msg = createMessage(Value.ToString());
                 Publisher.begin_put_message(msg);
             }
-            logger.Warn(String.Format("Signal sent")); 
+            //logger.Warn(String.Format("Signal sent")); 
 
         }
 

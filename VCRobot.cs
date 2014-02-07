@@ -237,9 +237,8 @@ namespace VC2HMS
             //executor stuff
             result = Component.findBehavioursOfType("RslExecutor");
             Executor = (IvcExecutor)result[0];
-            Executor.addExecutorClient(this);
-            // IvcRslExecutor rslex =  (IvcRslExecutor) Executor;
-            ((IvcPropertyList)Executor).setProperty("ExecutionMode", true);  //we are ready
+            //Executor.addExecutorClient(this);
+            //((IvcPropertyList)Executor).setProperty("ExecutionMode", true);  //we are ready
 
             //testing
             string pname = ((IvcPropertyList)Executor).getProperty("DigitalMapIn");

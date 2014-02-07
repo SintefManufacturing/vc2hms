@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using log4net.Appender;
 
 using icehms;
+using System.Threading;
 
 namespace VC2HMS
 {
@@ -73,7 +74,7 @@ namespace VC2HMS
         public void Stop()
         {
             StopButton.Enabled = false;
-            log.Info("\nCleaning up\n");
+            log.Warn("Shutting down VCManager\n");
             try
             {
                 if (vcapp != null)
@@ -86,6 +87,8 @@ namespace VC2HMS
             }
             finally
             {
+                Thread.Sleep(500); //Even if we deregistered from everything we mail still be called by VC ....
+                log.Warn("Shutting down IceApp\n");
                 if (iceapp != null)
                 {
                     iceapp.shutdown();
