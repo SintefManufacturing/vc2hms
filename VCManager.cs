@@ -189,7 +189,7 @@ namespace VC2HMS
 
         public string ApplicationName
         {
-            get { return "VC2IceHMS"; }
+            get { return "VC2HMS"; }
         }
 
         public void notifyApplication(bool AppReady)

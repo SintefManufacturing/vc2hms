@@ -160,7 +160,14 @@ namespace VC2HMS
                 //m_pub.newBooleanSignal(m_Signal.getProperty("Name"), Property.ExtendedValue);
                 //Now send a message
                 hms.Message msg = createMessage(Value.ToString());
-                Publisher.begin_put_message(msg);
+                try
+                {
+                    Publisher.begin_put_message(msg);
+                }
+                catch (Ice.Exception ex)
+                {
+                    logger.Warn("Error publishing signal message" + msg + ex);
+                }
             }
             //logger.Warn(String.Format("Signal sent")); 
 
