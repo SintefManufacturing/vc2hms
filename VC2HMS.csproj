@@ -54,10 +54,10 @@
     <StartupObject>VC2HMS.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>E269898CEE779467BF2D9BC22F5A0A225B3C3044</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>FD77784952D5772619BF549864CBB71D315A8EC1</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>VC2HMS_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>VC2HMS_1_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -82,7 +82,7 @@
       <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\ZeroC\Ice-3.4.2\bin\IceStorm.dll</HintPath>
     </Reference>
     <Reference Include="log4net">
-      <HintPath>extlib\log4net.dll</HintPath>
+      <HintPath>..\icehms\external\log4net-1.2.13\bin\net\4.0\release\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -135,6 +135,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <None Include="vc2hms.ice" />
+    <None Include="VC2HMS_1_TemporaryKey.pfx" />
     <None Include="VC2HMS_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +166,15 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+    <COMReference Include="vcCOMcsgen">
+      <Guid>{8FC9333B-6B80-4357-89FE-365E85FC75F1}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
     <COMReference Include="vcCOMecat">
       <Guid>{60D8996C-AF3B-4FC4-AE13-6E9F165D8B2F}</Guid>
       <VersionMajor>1</VersionMajor>
@@ -178,6 +188,33 @@
       <Guid>{4D5EF9C2-ADC8-4D0C-8136-147EC5BA449B}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>1</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="vcCOMgeo">
+      <Guid>{F7272A61-EA6E-4B29-A2D5-A46ED9EE24BB}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>6</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="vcCOMgui">
+      <Guid>{28EEE7B6-BA62-42E4-91D1-05DC0B2458B3}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="vccompathobj">
+      <Guid>{D4090AB4-DD2A-4110-A770-20360A45FDB1}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>3</VersionMinor>
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
@@ -233,7 +270,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties ZerocIce_Tie="True" ZerocIce_IncludePath="C:\Users\olrd\Documents\GitHub\icehms\slices|C:\Users\olrd\Documents\GitHub\vc2icehms" ZerocIce_Prefix="True" ZerocIce_OutputDir="." ZerocIce_Enabled="True" ZerocIce_VerboseLevel="2" ZerocIce_ProjectVersion="1" />
+      <UserProperties ZerocIce_Tie="True" ZerocIce_IncludePath=".\..\..\..\..\olrd\Documents\GitHub\icehms\slices|.\..\..\..\..\olrd\Documents\GitHub\vc2icehms|C:\Users\olivier\Documents\dev\icehms\slices|C:\Users\olivier\Documents\dev\vc2hms" ZerocIce_Prefix="True" ZerocIce_OutputDir="." ZerocIce_Enabled="True" ZerocIce_VerboseLevel="2" ZerocIce_ProjectVersion="1" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -22,7 +22,7 @@
         "Entry"
         {
         "MsmKey" = "8:_10936A689F0A3FF95DAB2606771A564C"
-        "OwnerKey" = "8:_7BCBB40B93926E9F1FD54CE00C547EAD"
+        "OwnerKey" = "8:_C4B2D031AAC0087BE671E8FC1FF3EE6E"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -45,20 +45,14 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_7BCBB40B93926E9F1FD54CE00C547EAD"
+        "MsmKey" = "8:_A534C3A5CAD5CF4252546107A805A6C6"
         "OwnerKey" = "8:_EB50F934D934439DBB0F166259983239"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_7C9B24318D592AF793EB8ABA4B7775EF"
-        "OwnerKey" = "8:_7BCBB40B93926E9F1FD54CE00C547EAD"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7C9B24318D592AF793EB8ABA4B7775EF"
-        "OwnerKey" = "8:_EB50F934D934439DBB0F166259983239"
+        "MsmKey" = "8:_A534C3A5CAD5CF4252546107A805A6C6"
+        "OwnerKey" = "8:_C4B2D031AAC0087BE671E8FC1FF3EE6E"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -70,7 +64,7 @@
         "Entry"
         {
         "MsmKey" = "8:_AFFB96B5781B1E6BFC302421B6554B25"
-        "OwnerKey" = "8:_7BCBB40B93926E9F1FD54CE00C547EAD"
+        "OwnerKey" = "8:_C4B2D031AAC0087BE671E8FC1FF3EE6E"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -99,6 +93,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_C4B2D031AAC0087BE671E8FC1FF3EE6E"
+        "OwnerKey" = "8:_EB50F934D934439DBB0F166259983239"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_EB50F934D934439DBB0F166259983239"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -112,7 +112,7 @@
         "Entry"
         {
         "MsmKey" = "8:_FCB59A3567B2FD22D7AAE4B30D1F80A5"
-        "OwnerKey" = "8:_7BCBB40B93926E9F1FD54CE00C547EAD"
+        "OwnerKey" = "8:_C4B2D031AAC0087BE671E8FC1FF3EE6E"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -124,13 +124,13 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_7BCBB40B93926E9F1FD54CE00C547EAD"
+        "OwnerKey" = "8:_C4B2D031AAC0087BE671E8FC1FF3EE6E"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_7C9B24318D592AF793EB8ABA4B7775EF"
+        "OwnerKey" = "8:_A534C3A5CAD5CF4252546107A805A6C6"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -361,45 +361,14 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_7BCBB40B93926E9F1FD54CE00C547EAD"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_A534C3A5CAD5CF4252546107A805A6C6"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:IceHMS, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86"
+            "AssemblyAsmDisplayName" = "8:log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_7BCBB40B93926E9F1FD54CE00C547EAD"
-                    {
-                    "Name" = "8:IceHMS.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:IceHMS.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_EB1D074021B34BCB828A4EDBBD1EB360"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_7C9B24318D592AF793EB8ABA4B7775EF"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_7C9B24318D592AF793EB8ABA4B7775EF"
+                    "_A534C3A5CAD5CF4252546107A805A6C6"
                     {
                     "Name" = "8:log4net.dll"
                     "Attributes" = "3:512"
@@ -437,6 +406,37 @@
                     }
                 }
             "SourcePath" = "8:Ice.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_EB1D074021B34BCB828A4EDBBD1EB360"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_C4B2D031AAC0087BE671E8FC1FF3EE6E"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:IceHMS, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86"
+                "ScatterAssemblies"
+                {
+                    "_C4B2D031AAC0087BE671E8FC1FF3EE6E"
+                    {
+                    "Name" = "8:IceHMS.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:IceHMS.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_EB1D074021B34BCB828A4EDBBD1EB360"
@@ -541,15 +541,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:VC2HMS"
-        "ProductCode" = "8:{1CEA83FB-BA38-464F-BC98-0D8DC43E0C83}"
-        "PackageCode" = "8:{2F013B4E-43DB-4289-B6CD-6A2A6043463E}"
+        "ProductCode" = "8:{04C64D2C-2641-4A8E-94AC-1ED1C4C3BC95}"
+        "PackageCode" = "8:{9950AFC4-20D7-463C-8D86-06AF675480EA}"
         "UpgradeCode" = "8:{4FEC1BB7-25EC-4A43-B116-14A9BEEF23BA}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
-        "DetectNewerInstalledVersion" = "11:TRUE"
+        "DetectNewerInstalledVersion" = "11:FALSE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:0.2"
+        "ProductVersion" = "8:0.21"
         "Manufacturer" = "8:SINTEF"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

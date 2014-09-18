@@ -104,7 +104,15 @@ namespace VC2HMS
         public void shutdown()
         {
             _shutdown = true;
-            IvcApp.removeClient(this);
+            try
+            {
+                logger.Info("Unsubscribing from visual component " );
+                IvcApp.removeClient(this);
+            }
+            catch (Ice.Exception ex)
+            {
+                logger.Warn("Error Unsubscribing from VC " + ex);
+            }
 
             foreach (VCComponent comp in Components)
             {
@@ -195,6 +203,11 @@ namespace VC2HMS
         public void notifyApplication(bool AppReady)
         {
             logger.Info("NotifyApplication: " + AppReady);
+            if (! AppReady)
+            {
+                logger.Warn("Error VC is going down");
+                shutdown();
+            }
         }
 
         public void notifyCommand(ref IvcCommand command, int State)
@@ -246,6 +259,7 @@ namespace VC2HMS
             if (!isCreated(name))
             {
                 VCComponent mycomp;
+                /*
                 if (VCRobot.isRobot(comp))
                 {
                     VCRobot rob = new VCRobot(this, comp, name);
@@ -253,8 +267,9 @@ namespace VC2HMS
                 }
                 else
                 {
+                 * */
                     mycomp = new VCComponent(this, comp, name);
-                }
+                //}
                 Components.Add(mycomp);
                 return true;
             }

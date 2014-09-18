@@ -87,7 +87,7 @@ namespace VC2HMS
             }
             finally
             {
-                Thread.Sleep(500); //Even if we deregistered from everything we mail still be called by VC ....
+                Thread.Sleep(500); //Even if we deregistered from everything we may still be called by VC ....
                 log.Warn("Shutting down IceApp\n");
                 if (iceapp != null)
                 {
